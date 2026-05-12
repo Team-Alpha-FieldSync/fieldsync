@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="app.diagrams.net" modified="2026-05-09T00:00:00.000Z" agent="Claude" version="24.0.0">
+  <diagram name="FieldSync Architecture" id="fieldsync-arch">
+    <mxGraphModel dx="1422" dy="900" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1200" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- ===== TITLE ===== -->
+        <mxCell id="title" value="FieldSync — System Architecture" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;fontSize=20;fontStyle=1;fontColor=#1F4E79;" vertex="1" parent="1">
+          <mxGeometry x="200" y="20" width="450" height="30" as="geometry" />
+        </mxCell>
+
+        <!-- ===== CLIENT LAYER LABEL ===== -->
+        <mxCell id="client-label" value="Client layer (React SPA — CSR)" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;fontSize=11;fontColor=#595959;fontStyle=2;" vertex="1" parent="1">
+          <mxGeometry x="60" y="65" width="250" height="20" as="geometry" />
+        </mxCell>
+
+        <!-- Admin dashboard -->
+        <mxCell id="admin" value="&lt;b&gt;Admin dashboard&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size: 11px&quot; color=&quot;#185FA5&quot;&gt;Manage all jobs&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E6F1FB;strokeColor=#185FA5;fontColor=#0C447C;fontSize=13;arcSize=15;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="60" y="90" width="200" height="70" as="geometry" />
+        </mxCell>
+
+        <!-- Technician app -->
+        <mxCell id="technician" value="&lt;b&gt;Technician app&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size: 11px&quot; color=&quot;#185FA5&quot;&gt;Mobile, 375px+&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E6F1FB;strokeColor=#185FA5;fontColor=#0C447C;fontSize=13;arcSize=15;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="325" y="90" width="200" height="70" as="geometry" />
+        </mxCell>
+
+        <!-- Client portal -->
+        <mxCell id="client" value="&lt;b&gt;Client portal&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size: 11px&quot; color=&quot;#185FA5&quot;&gt;View notifications&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E6F1FB;strokeColor=#185FA5;fontColor=#0C447C;fontSize=13;arcSize=15;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="590" y="90" width="200" height="70" as="geometry" />
+        </mxCell>
+
+        <!-- ===== APOLLO CLIENT ===== -->
+        <mxCell id="apollo-client" value="&lt;b&gt;Apollo Client&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size: 11px&quot; color=&quot;#534AB7&quot;&gt;Queries, mutations, cache&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#EEEDFE;strokeColor=#534AB7;fontColor=#3C3489;fontSize=13;arcSize=15;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="280" y="220" width="290" height="65" as="geometry" />
+        </mxCell>
+
+        <!-- Arrows from client views to Apollo Client -->
+        <mxCell id="arr-admin-apollo" style="endArrow=classic;html=1;rounded=0;strokeColor=#73726c;strokeWidth=1.5;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.25;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="admin" target="apollo-client">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="arr-tech-apollo" style="endArrow=classic;html=1;rounded=0;strokeColor=#73726c;strokeWidth=1.5;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="technician" target="apollo-client">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="arr-client-apollo" style="endArrow=classic;html=1;rounded=0;strokeColor=#73726c;strokeWidth=1.5;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.75;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="client" target="apollo-client">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- JWT note -->
+        <mxCell id="jwt-note" value="JWT in Authorization header" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;fontSize=11;fontColor=#595959;fontStyle=2;" vertex="1" parent="1">
+          <mxGeometry x="590" y="320" width="200" height="20" as="geometry" />
+        </mxCell>
+
+        <!-- Dashed arrow Apollo Client -> API layer -->
+        <mxCell id="arr-apollo-api" style="endArrow=classic;html=1;rounded=0;strokeColor=#73726c;strokeWidth=1.5;dashed=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="apollo-client" target="api-layer">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- ===== GRAPHQL API LAYER (container) ===== -->
+        <mxCell id="api-layer" value="&lt;b&gt;GraphQL API layer&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size: 11px&quot; color=&quot;#5F5E5A&quot;&gt;Node.js + Express + Apollo Server&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F1EFE8;strokeColor=#5F5E5A;fontColor=#444441;fontSize=13;arcSize=8;verticalAlign=top;align=left;spacingLeft=15;spacingTop=10;" vertex="1" parent="1">
+          <mxGeometry x="60" y="360" width="730" height="280" as="geometry" />
+        </mxCell>
+
+        <!-- Auth middleware -->
+        <mxCell id="auth-mw" value="&lt;b&gt;Auth middleware&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size: 11px&quot; color=&quot;#854F0B&quot;&gt;Verify JWT, attach user&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FAEEDA;strokeColor=#BA7517;fontColor=#633806;fontSize=13;arcSize=15;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="80" y="420" width="210" height="70" as="geometry" />
+        </mxCell>
+
+        <!-- Schema -->
+        <mxCell id="schema" value="&lt;b&gt;Schema&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size: 11px&quot; color=&quot;#854F0B&quot;&gt;Types, queries, mutations&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FAEEDA;strokeColor=#BA7517;fontColor=#633806;fontSize=13;arcSize=15;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="320" y="420" width="210" height="70" as="geometry" />
+        </mxCell>
+
+        <!-- Resolvers -->
+        <mxCell id="resolvers" value="&lt;b&gt;Resolvers&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size: 11px&quot; color=&quot;#854F0B&quot;&gt;RBAC + business logic&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FAEEDA;strokeColor=#BA7517;fontColor=#633806;fontSize=13;arcSize=15;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="560" y="420" width="210" height="70" as="geometry" />
+        </mxCell>
+
+        <!-- bcryptjs -->
+        <mxCell id="bcrypt" value="&lt;b&gt;bcryptjs&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size: 11px&quot; color=&quot;#993C1D&quot;&gt;Hash and compare&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FAECE7;strokeColor=#993C1D;fontColor=#712B13;fontSize=13;arcSize=15;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="80" y="530" width="210" height="70" as="geometry" />
+        </mxCell>
+
+        <!-- JWT signing -->
+        <mxCell id="jwt-sign" value="&lt;b&gt;JWT signing&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size: 11px&quot; color=&quot;#993C1D&quot;&gt;Issue tokens on login&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FAECE7;strokeColor=#993C1D;fontColor=#712B13;fontSize=13;arcSize=15;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="320" y="530" width="210" height="70" as="geometry" />
+        </mxCell>
+
+        <!-- Mongoose -->
+        <mxCell id="mongoose" value="&lt;b&gt;Mongoose ODM&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size: 11px&quot; color=&quot;#993C1D&quot;&gt;Schemas, validation&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FAECE7;strokeColor=#993C1D;fontColor=#712B13;fontSize=13;arcSize=15;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="560" y="530" width="210" height="70" as="geometry" />
+        </mxCell>
+
+        <!-- Arrow from API layer to MongoDB -->
+        <mxCell id="arr-api-db" style="endArrow=classic;html=1;rounded=0;strokeColor=#73726c;strokeWidth=1.5;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="api-layer" target="mongo-layer">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- ===== MONGODB CONTAINER ===== -->
+        <mxCell id="mongo-layer" value="&lt;b&gt;MongoDB database&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size: 11px&quot; color=&quot;#0F6E56&quot;&gt;Document store, indexed queries&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E1F5EE;strokeColor=#0F6E56;fontColor=#085041;fontSize=13;arcSize=8;verticalAlign=top;align=left;spacingLeft=15;spacingTop=10;" vertex="1" parent="1">
+          <mxGeometry x="60" y="690" width="730" height="240" as="geometry" />
+        </mxCell>
+
+        <!-- users collection -->
+        <mxCell id="users-coll" value="&lt;b&gt;users&lt;/b&gt;&lt;br&gt;&lt;br&gt;&lt;font style=&quot;font-size: 11px&quot; color=&quot;#0F6E56&quot;&gt;name, email&lt;br&gt;password, role&lt;br&gt;admin or tech or client&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E1F5EE;strokeColor=#0F6E56;fontColor=#085041;fontSize=13;arcSize=15;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="80" y="750" width="210" height="160" as="geometry" />
+        </mxCell>
+
+        <!-- jobs collection -->
+        <mxCell id="jobs-coll" value="&lt;b&gt;jobs&lt;/b&gt;&lt;br&gt;&lt;br&gt;&lt;font style=&quot;font-size: 11px&quot; color=&quot;#0F6E56&quot;&gt;title, description&lt;br&gt;location, status&lt;br&gt;technician, client refs&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E1F5EE;strokeColor=#0F6E56;fontColor=#085041;fontSize=13;arcSize=15;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="320" y="750" width="210" height="160" as="geometry" />
+        </mxCell>
+
+        <!-- notifications collection -->
+        <mxCell id="notif-coll" value="&lt;b&gt;notifications&lt;/b&gt;&lt;br&gt;&lt;br&gt;&lt;font style=&quot;font-size: 11px&quot; color=&quot;#0F6E56&quot;&gt;user ref, message&lt;br&gt;read, createdAt&lt;br&gt;auto-generated&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E1F5EE;strokeColor=#0F6E56;fontColor=#085041;fontSize=13;arcSize=15;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="560" y="750" width="210" height="160" as="geometry" />
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

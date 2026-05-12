@@ -1,3 +1,5 @@
+import 'dotenv/config';
+import connectDB from './config/db.js';
 import express from 'express';
 
 const app = express();
@@ -10,8 +12,15 @@ app.get('/health', (req, res) => {
     res.json({ok:true, message: 'FieldSync API is live and healthy'})
 });
 
-//Start listening
-const PORT = 4000;
+//Connect to MongoDB
+const start = async () => {
+    await connectDB();
+}
+
+//Start listening on express server
+const PORT = process.env.PORT || 4000;
 app.listen(PORT, () =>{
     console.log(`Server running on http://localhost:${PORT}`)
 });
+
+start();

@@ -12,12 +12,15 @@ enum JobStatus{
     IN_PROGRESS
     COMPLETED
     VERIFIED
+    CANCELLED
 }
 
 enum NotificationType{
-    ASSIGNED
-    STATUS_CHANGED
-    COMPLETED
+    JOB_ASSIGNED
+    JOB_UPDATED
+    JOB_COMPLETED
+    JOB_VERIFIED
+    SYSTEM_ALERT
 }
 
 #=== TYPES ===

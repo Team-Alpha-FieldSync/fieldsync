@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import { NOTIFICATION_TYPE } from '../utils/constants.jsc';
+import { NOTIFICATION_TYPE } from '../utils/constants.js';
 
 const notificationSchema = new mongoose.Schema(
     {

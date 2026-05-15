@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import { JOB_STATUS } from '../utils/constants.js';
 
 const jobSchema = new mongoose.Schema(
     {
@@ -25,10 +26,10 @@ const jobSchema = new mongoose.Schema(
             type: String,
             required: true,
             enum: {
-                values: ['pending', 'in_progress', 'completed','verified'],
+                values: Object.values(JOB_STATUS),
                 message: '{VALUE} is not a valid status',
             },
-            default: 'pending',
+            default: JOB_STATUS.PENDING,
         },
         technician: {
             type: mongoose.Schema.Types.ObjectId,

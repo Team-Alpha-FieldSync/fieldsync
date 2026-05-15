@@ -7,49 +7,49 @@ import resolvers from './graphql/resolvers/index.js'
 import { ApolloServer } from '@apollo/server';
 import { expressMiddleware } from '@as-integrations/express5';
 
-//Connect to MongoDB
 const start = async () => {
+    //Connect to MongoDB
     await connectDB();
+
+    //Initiate Express server
+    const app = express();
+
+    //Initiate Apollo Server(Connect to schema and resolvers)
+    const apollo = new ApolloServer({
+        typeDefs,
+        resolvers,
+    });
+    
+    //Starting Apollo Server
+    await apollo.start();
+    
+    //Mounting Apollo Server at /graphql
+    app.use(
+        '/graphql',
+        cors({origin: process.env.CLIENT_URL || '*'}),
+        express.json(),
+        expressMiddleware(apollo, {
+            //TODO(Configure security in JWT ticket)
+            context: async ({req}) => ({
+                user: null,
+            }),
+        })
+    );
+    
+    //Health Check
+    app.get('/health', (req, res) => {
+        res.json({ok:true, message: 'FieldSync API is live and healthy'})
+    });
+    
+    
+    //Start listening on servers
+    const PORT = process.env.PORT || 4000;
+    app.listen(PORT, () =>{
+        //Express Server
+        console.log(`Server running on http://localhost:${PORT}`)
+        //Apollo Server
+        console.log(`GraphQL endpoint: http://localhost:${PORT}/graphql`);
+    });
 }
-
-//Initiate Express server
-const app = express();
-
-//Initiate Apollo Server(Connect to schema and resolvers)
-const apollo = new ApolloServer({
-    typeDefs,
-    resolvers,
-});
-
-//Starting Apollo Server
-await apollo.start();
-
-//Mounting Apollo Server at /graphql
-app.use(
-    '/graphql',
-    cors({origin: process.env.CLIENT_URL || '*'}),
-    express.json(),
-    expressMiddleware(apollo, {
-        //TODO(Configure security in JWT ticket)
-        context: async ({req}) => ({
-            user: null,
-        }),
-    })
-);
-
-//Health Check
-app.get('/health', (req, res) => {
-    res.json({ok:true, message: 'FieldSync API is live and healthy'})
-});
-
-
-//Start listening on servers
-const PORT = process.env.PORT || 4000;
-app.listen(PORT, () =>{
-    //Express Server
-    console.log(`Server running on http://localhost:${PORT}`)
-    //Apollo Server
-    console.log(`GraphQL endpoint: http://localhost:${PORT}/graphql`);
-});
 
 start();

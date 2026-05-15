@@ -1,26 +1,55 @@
 import 'dotenv/config';
-import connectDB from './config/db.js';
+import cors from 'cors';
 import express from 'express';
-
-const app = express();
-
-//Middleware to parse JSON request bodies
-app.use(express.json());
-
-//Simple test route
-app.get('/health', (req, res) => {
-    res.json({ok:true, message: 'FieldSync API is live and healthy'})
-});
+import connectDB from './config/db.js';
+import typeDefs from './graphql/schema.js';
+import resolvers from './graphql/resolvers/index.js'
+import { ApolloServer } from '@apollo/server';
+import { expressMiddleware } from '@as-integrations/express5';
 
 //Connect to MongoDB
 const start = async () => {
     await connectDB();
 }
 
-//Start listening on express server
+//Initiate Express server
+const app = express();
+
+//Initiate Apollo Server(Connect to schema and resolvers)
+const apollo = new ApolloServer({
+    typeDefs,
+    resolvers,
+});
+
+//Starting Apollo Server
+await apollo.start();
+
+//Mounting Apollo Server at /graphql
+app.use(
+    '/graphql',
+    cors({origin: process.env.CLIENT_URL || '*'}),
+    express.json(),
+    expressMiddleware(apollo, {
+        //TODO(Configure security in JWT ticket)
+        context: async ({req}) => ({
+            user: null,
+        }),
+    })
+);
+
+//Health Check
+app.get('/health', (req, res) => {
+    res.json({ok:true, message: 'FieldSync API is live and healthy'})
+});
+
+
+//Start listening on servers
 const PORT = process.env.PORT || 4000;
 app.listen(PORT, () =>{
+    //Express Server
     console.log(`Server running on http://localhost:${PORT}`)
+    //Apollo Server
+    console.log(`GraphQL endpoint: http://localhost:${PORT}/graphql`);
 });
 
 start();

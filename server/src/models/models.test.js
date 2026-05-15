@@ -5,47 +5,75 @@ import Job from './Job.js';
 import Notification from './Notification.js';
 
 const test = async () => {
-    await mongoose.connect(process.env.MONGODB_URI);
-    console.log('Connected');
-
-    //Trying to create client(No password - Should succeed)
     try{
-        const client = await User.create({
-            name:'Text Client',
-            email: `test-${Date.now()}@example.com`,
-            role: 'client',
-        });
-        console.log('Created client:', client._id.toString());
+
+        await mongoose.connect(process.env.MONGODB_URI);
+        console.log('Connected');
+    
+        //Trying to create client(No password - Should succeed)
+        try{
+            const client = await User.create({
+                name:'Text Client',
+                email: `test-${Date.now()}@example.com`,
+                role: 'client',
+            });
+            console.log('Created client:', client._id.toString());
+        }catch(err){
+            console.log('Client creation failed:', err.message);
+        }
+    
+        //Trying to create a technician without password (Needs password - Should fail)
+        try{
+            await User.create({
+                name: 'Bad Technician',
+                email: `bad-${Date.now()}@example.com`,
+                role: 'technician',
+            });
+            console.error('ERROR: technician without password was allowed!');
+        }catch(err){
+            console.log('Correctly rejected technician without password');
+        }
+    
+        //Try creating a user with invalid role (Needs valid role - Should fail)
+        try{
+            await User.create({
+                name: 'Invalid',
+                email: `invalid-${Date.now()}@example.com`,
+                role: 'superuser',
+            });
+            console.error('ERROR, invalid role was allowed!');
+        }catch (err){
+            console.log('Correctly rejected invalid role');
+        }
+        
+        //Duplicate email validation test
+        try{
+            const email = `duplicate-${Date.now()}@example.com`;
+
+            await User.create({
+                name: 'User one',
+                email,
+                role: 'client',
+            });
+
+            await User.create({
+                name: 'User Two',
+                email,
+                role: 'client',
+            })
+
+            console.error('ERROR: duplicate email was allowed!');
+        }catch (err){
+            console.log('Correctly rejected duplicate email');
+        }
+        
     }catch(err){
-        console.log('Client creation failed:', err.message);
+        console.error('Database connection failed:', err.message);
+    }finally{ 
+        await mongoose.disconnect();
+        console.log('Disconnected');
     }
 
-    //Trying to create a technician without password (Needs password - Should fail)
-    try{
-        await User.create({
-            name: 'Bad Technician',
-            email: `bad-${Date.now()}@example.com`,
-            role: 'technician',
-        });
-        console.error('ERROR: technician without password was allowed!');
-    }catch(err){
-        console.log('Correctly rejected technician without password');
-    }
-
-    //Try creating a user with invalid role (Needs valid role - Should fail)
-    try{
-        await User.create({
-            name: 'Invalid',
-            email: `invalid-${Date.now()}@example.com`,
-            role: 'superuser',
-        });
-        console.error('ERROR, invalid role was allowed!');
-    }catch (err){
-        console.log('Correctly rejected invalid role');
-    }
-
-    await mongoose.disconnect();
-    console.log('Done');
 };
 
 test();

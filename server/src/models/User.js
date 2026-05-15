@@ -24,7 +24,7 @@ const userSchema = new mongoose.Schema(
             required: function () {
                 return this.role !== 'client';
             },
-            minlenght: 8,
+            minlength: 8,
             // exclude from queries by default; explicitly select for login
             select: false, 
         },

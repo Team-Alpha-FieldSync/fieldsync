@@ -13,7 +13,7 @@ export const requireAdmin =(user) => {
     requireAuth(user);
     if(user.role !== ROLES.ADMIN){
         throw new GraphQLError('Admin access required', {
-            extensions: {cose: 'FORBIDDEN'},
+            extensions: {code: 'FORBIDDEN'},
         });
     }
 };

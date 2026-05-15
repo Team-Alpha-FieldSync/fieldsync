@@ -14,7 +14,7 @@ export default {
 
             //TODO (JWT ticket): Must replace with bcrypt.compare(password, user.password)
             //For now, will accept any password
-            const isValid = password.length > 0;
+            const isValid = true;
 
             if (!isValid){
                 throw new GraphQLError('INvalid credentials', {

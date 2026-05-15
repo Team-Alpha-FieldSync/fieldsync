@@ -46,6 +46,12 @@ export default {
     Mutation: {
         createJob: async(_, {input}, {user}) => {
             requireAdmin(user);
+            //Github Comment Fix
+            if(input.technicianId === input.clientId){
+                throw new GraphQLError('Technician and client cannot be the same user', {
+                    extensions: {code: 'BAD_USER_INPUT'},
+                });
+            }
 
             //Verify the technician and client exist with the right roles
             const technician = await User.findById(input.technicianId);

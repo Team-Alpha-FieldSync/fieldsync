@@ -2,7 +2,6 @@ import authResolvers from './auth.js';
 import userResolvers from './user.js';
 import jobResolvers from './job.js';
 import notificationResolvers from './notification.js';
-import notification from './notification.js';
 
 //Merging resolvers from each file.
 //Each one contributes its fields, and any type-level field resolvers.
@@ -22,7 +21,7 @@ const resolvers = {
     //Type-level field resolvers
     User: userResolvers.User,
     Job: jobResolvers.Job,
-    Notification: notification.Notification,
+    Notification: notificationResolvers.Notification,
 };
 
 export default resolvers;

@@ -1,9 +1,8 @@
 import { GraphQLError } from "graphql";
-import Notification from '../../models/Notification.js';
-import User from '../../models/User.js'
-import job from '../../models/Job.js';
-import {requireAuth} from '../../guards/roles.js';
 import Job from "../../models/Job.js";
+import User from '../../models/User.js'
+import Notification from '../../models/Notification.js';
+import {requireAuth} from '../../guards/roles.js';
 
 export default {
     Query: {

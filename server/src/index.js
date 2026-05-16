@@ -30,9 +30,10 @@ const start = async () => {
         cors({origin: process.env.CLIENT_URL || '*'}),
         express.json(),
         expressMiddleware(apollo, {
-            context: async ({req}) => ({
-                user: getUserFromRequest(req),
+            context: async ({req}) => ({  
+               user: getUserFromRequest(req),
             }),
+
         })
     );
     

@@ -37,6 +37,7 @@ export const verifyToken = (token) => {
         // Invalid signature, expired, malformed - treat as no auth.
         // Resolvers will see context.user as null and the role guards
         // will throw "You must be logged in".
+        console.error('JWT verify failed:', err.message);
         return null;
     }
 };

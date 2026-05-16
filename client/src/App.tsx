@@ -1,8 +1,10 @@
+import AuthLayout from "./layouts/AuthLayout"
+
 function App() {
 
   return (
     <>
-      <div className='text-xl bg-blue-500'>FieldSync Project</div>
+      <AuthLayout/>
     </>
   )
 }

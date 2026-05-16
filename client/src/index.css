@@ -1,1 +1,24 @@
 @import "tailwindcss";
+
+@theme {
+  /* Backgrounds */
+  --color-bg-dark: oklch(0.25 0.05 156);   
+  --color-bg: oklch(0.98 0.01 248);      
+  --color-bg-light: oklch(1 0 0);         
+  /* Text */
+  --color-text: oklch(0.21 0.01 285);
+  --color-text-muted: oklch(0.55 0.01 285);
+  --color-highlight: oklch(0.83 0.16 153); 
+  
+  /* Borders */
+  --color-border: oklch(0.91 0.01 285);    
+  --color-border-muted: oklch(0.95 0.01 285); 
+  
+  /* Brand & Status Colors */
+  --color-primary: oklch(0.32 0.06 156);   
+  --color-secondary: oklch(0.36 0.05 156); 
+  --color-danger: oklch(0.71 0.16 25);     
+  --color-warning: oklch(0.76 0.16 90);   
+  --color-success: oklch(0.72 0.16 153);   
+  --color-info: oklch(0.62 0.17 256);    
+}

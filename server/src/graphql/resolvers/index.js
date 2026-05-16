@@ -1,6 +1,7 @@
 import authResolvers from './auth.js';
 import userResolvers from './user.js';
 import jobResolvers from './job.js';
+import enumResolvers from './enums.js'
 import notificationResolvers from './notification.js';
 
 //Merging resolvers from each file.
@@ -22,6 +23,8 @@ const resolvers = {
     User: userResolvers.User,
     Job: jobResolvers.Job,
     Notification: notificationResolvers.Notification,
+
+    ...enumResolvers,
 };
 
 export default resolvers;

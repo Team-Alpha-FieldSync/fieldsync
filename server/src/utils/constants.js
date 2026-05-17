@@ -9,10 +9,13 @@ export const JOB_STATUS = {
     IN_PROGRESS: 'in_progress',
     COMPLETED: 'completed',
     VERIFIED: 'verified',
+    CANCELLED: 'cancelled',
 };
 
 export const NOTIFICATION_TYPE = {
-    ASSIGNED: 'assigned',
-    STATUS_CHANGED: 'status_changed',
-    COMPLETED: 'completed',
+    JOB_ASSIGNED: 'job_assigned',
+    JOB_UPDATED: 'job_updated',
+    JOB_COMPLETED: 'job_completed',
+    JOB_VERIFIED: 'job_verified',
+    SYSTEM_ALERT: 'system_alert',
 };

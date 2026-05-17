@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import { NOTIFICATION_TYPE } from '../utils/constants.js';
 
 const notificationSchema = new mongoose.Schema(
     {
@@ -10,13 +11,13 @@ const notificationSchema = new mongoose.Schema(
         job: {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'Job',
-            required: true,
+            required: false,
         },
         type: {
             type: String,
             required: true,
             enum: {
-                values: ['assigned', 'status_changed', 'completed'],
+                values: Object.values(NOTIFICATION_TYPE),
                 message: '{VALUE} is not a valid notification type',
             },
         },

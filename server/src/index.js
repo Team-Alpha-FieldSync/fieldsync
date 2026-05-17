@@ -6,6 +6,7 @@ import typeDefs from './graphql/schema.js';
 import resolvers from './graphql/resolvers/index.js'
 import { ApolloServer } from '@apollo/server';
 import { expressMiddleware } from '@as-integrations/express5';
+import { getUserFromRequest } from './middleware/auth.js';
 
 const start = async () => {
     //Connect to MongoDB
@@ -29,10 +30,10 @@ const start = async () => {
         cors({origin: process.env.CLIENT_URL || '*'}),
         express.json(),
         expressMiddleware(apollo, {
-            //TODO(Configure security in JWT ticket)
-            context: async ({req}) => ({
-                user: null,
+            context: async ({req}) => ({  
+               user: getUserFromRequest(req),
             }),
+
         })
     );
     

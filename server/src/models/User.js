@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import { ROLES } from '../utils/constants.js';
 
 const userSchema = new mongoose.Schema(
     {
@@ -22,7 +23,7 @@ const userSchema = new mongoose.Schema(
             // Required only for users who log in (admin, technician).
             // Clients don't authenticate
             required: function () {
-                return this.role !== 'client';
+                return this.role !== ROLES.CLIENT;
             },
             minlength: 8,
             // exclude from queries by default; explicitly select for login
@@ -32,7 +33,7 @@ const userSchema = new mongoose.Schema(
             type: String,
             required: true,
             enum: {
-                values: ['admin', 'technician', 'client'],
+                values: Object.values(ROLES),
                 message: '{VALUE} is not a valid role',
             },
         },

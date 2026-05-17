@@ -1,6 +1,7 @@
-import { GraphQLError } from "graphql";
 import User from "../../models/User.js";
 import { ROLES } from "../../utils/constants.js";
+import { GraphQLError } from "graphql";
+import { hashPassword } from "../../utils/hashPassword.js";
 import { requireAdmin, requireAuth } from "../../guards/roles.js";
 
 export default{
@@ -42,9 +43,9 @@ export default{
                 });
             }
 
-            //TODO (JWT ticket): hash the password before saving
             return User.create({
                 ...input,
+                password: await hashPassword(input.password),
                 role: ROLES.TECHNICIAN,
                 createdBy: user.userId,
             });

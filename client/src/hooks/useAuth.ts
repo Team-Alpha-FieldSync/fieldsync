@@ -8,5 +8,11 @@ export default function useAuth() {
     throw new Error("useAuth must be used within AuthProvider");
   }
 
-  return context;
+  return {
+    user: context.user,
+    token: context.token,
+    isAuthenticated: context.isAuthenticated,
+    login: context.login,
+    logout: context.logout,
+  };
 }

@@ -9,7 +9,7 @@ type Props = {
 export default function TechnicianRoute({ children }: Props) {
   const { user } = useAuth();
 
-  if (!user || user.role !== "technician") {
+  if (!user || user.role !== "TECHNICIAN") {
     return <Navigate to="/unauthorized" replace />;
   }
 

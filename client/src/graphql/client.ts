@@ -1,6 +1,6 @@
 import {ApolloClient, ApolloLink, InMemoryCache, HttpLink,} from '@apollo/client';
 import { SetContextLink } from '@apollo/client/link/context';
-
+import { getToken } from "../auth/session";
 //GraphQL endpoints: Will read from .env file
 //Vite exposes env vars prefixed with VITE_ at build time.
 const GRAPHQL_URL = import.meta.env.VITE_GRAPHQL_URL
@@ -13,7 +13,7 @@ const httpLink = new HttpLink({
 //Auth Link - runs before every request
 //Adds the JWT to the headers if one exists in localStorage
 const authLink = new SetContextLink((prevContext) => {
-    const token = localStorage.getItem("token");
+    const token = getToken();
 
     return{
         ...prevContext,

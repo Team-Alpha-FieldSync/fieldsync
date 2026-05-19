@@ -1,9 +1,9 @@
+import { useState } from "react";
 import { useMutation } from "@apollo/client/react";
 import { useNavigate } from "react-router-dom";
 import useAuth from "../hooks/useAuth";
-
+import { getLoginErrorMessage } from "./getLoginErrorMessage";
 import { LOGIN_MUTATION } from "../graphql/mutations";
-
 import type { User } from "../types/auth";
 import type {
   LoginMutationData,
@@ -13,6 +13,7 @@ import type {
 export default function useLoginRedirect() {
   const { login } = useAuth();
   const navigate = useNavigate();
+  const [error, setError] = useState<string | null>(null);
 
   const [loginMutation, { loading }] = useMutation<
     LoginMutationData,
@@ -20,12 +21,17 @@ export default function useLoginRedirect() {
   >(LOGIN_MUTATION);
 
   const handleLogin = async (email: string, password: string) => {
+    setError(null);
+
     try {
       const { data } = await loginMutation({
         variables: { email, password },
       });
 
-      if (!data) return;
+      if (!data) {
+        setError("Login failed. Please try again.");
+        return;
+      }
 
       const user: User = {
         id: data.login.user.id,
@@ -34,30 +40,26 @@ export default function useLoginRedirect() {
       };
 
       login(data.login.token, user);
-      console.log("ROLE FROM BACKEND:", data.login.user.role);
-      // =========================
-      // ROLE-BASED REDIRECT
-      // =========================
+
       switch (user.role) {
         case "ADMIN":
           navigate("/admin");
           break;
-
         case "TECHNICIAN":
           navigate("/technician");
           break;
-
         default:
-          navigate("*");
+          navigate("/unauthorized");
           break;
       }
     } catch (err) {
-      console.error("Login failed:", err);
+      setError(getLoginErrorMessage(err));
     }
   };
 
   return {
     handleLogin,
     loading,
+    error,
   };
 }

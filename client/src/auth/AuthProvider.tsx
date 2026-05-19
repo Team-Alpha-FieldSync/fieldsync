@@ -1,53 +1,36 @@
 import { useState, type ReactNode } from "react";
 import type { User } from "../types/auth";
 import AuthContext from "../auth/AuthContext";
+import {
+  clearSession,
+  getStoredUser,
+  getToken,
+  persistSession,
+} from "./session";
 
-export default function AuthProvider({children,}: {
-  children: ReactNode;
-}) {
-  const [user, setUser] = useState<User | null>(() => {
-    try {
-      const storedUser = localStorage.getItem("user");
-      return storedUser ? JSON.parse(storedUser) : null;
-    } catch (error) {
-      console.error("Failed to access localStorage:", error);
-      return null;
-    }
-  });
-
-  const [token, setToken] = useState<string | null>(() => {
-    try {
-      return localStorage.getItem("token");
-    } catch (error) {
-      console.error("Failed to access localStorage:", error);
-      return null;
-    }
-  });
-
+export default function AuthProvider({ children }: { children: ReactNode }) {
+  const [user, setUser] = useState<User | null>(() => getStoredUser());
+  const [token, setToken] = useState<string | null>(() => getToken());
   const [loading] = useState(false);
 
   const isAuthenticated = !!token;
 
-
-  const login = (token: string, user: User) => {
-    localStorage.setItem("token", token);
-    localStorage.setItem("user", JSON.stringify(user));
-
-    setToken(token);
-    setUser(user);
+  const login = (newToken: string, newUser: User) => {
+    persistSession(newToken, newUser);
+    setToken(newToken);
+    setUser(newUser);
   };
 
   const logout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-
+    clearSession();
     setToken(null);
     setUser(null);
   };
 
-  
   return (
-    <AuthContext.Provider value={{ user, token, loading, isAuthenticated, login, logout }}>
+    <AuthContext.Provider
+      value={{ user, token, loading, isAuthenticated, login, logout }}
+    >
       {children}
     </AuthContext.Provider>
   );

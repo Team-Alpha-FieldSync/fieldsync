@@ -5,6 +5,6 @@ export default function Dashboard() {
     <div>
       Admin Dashboard
       <LogoutButton />
-    </div>
+      </div>
   );
 }

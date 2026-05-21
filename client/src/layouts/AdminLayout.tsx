@@ -1,5 +1,6 @@
 import { Outlet } from "react-router-dom";
 import LogoutButton from "../components/LogoutButton";
+import StatusBadge from "../components/StatusBadge";
 
 export default function AdminLayout(){
   return (
@@ -10,6 +11,10 @@ export default function AdminLayout(){
       </header>
 
       {/* Sidebar + Navbar will go here */}
+
+     
+        <StatusBadge status="pending" />
+      
 
       <Outlet />
     </div>

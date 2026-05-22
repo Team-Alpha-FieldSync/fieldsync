@@ -1,14 +1,13 @@
 import { Outlet } from "react-router-dom";
 import LogoutButton from "../components/LogoutButton";
 import StatusBadge from "../components/StatusBadge";
+import Navbar from "../components/Navbar";
 
 export default function AdminLayout(){
   return (
     <div>
-      <header className="flex items-center justify-between mb-4">
-        <h1>Admin Layout</h1>
-        <LogoutButton className="bg-red-500 text-white px-4 py-2 rounded" />
-      </header>
+      
+      <Navbar/>
 
       {/* Sidebar + Navbar will go here */}
 
@@ -17,6 +16,7 @@ export default function AdminLayout(){
       
 
       <Outlet />
+      <LogoutButton/>
     </div>
   );
 }

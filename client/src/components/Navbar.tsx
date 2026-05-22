@@ -1,107 +1,93 @@
-import React from "react";
-import {
-  LayoutDashboard,
-  Briefcase,
-  Users,
-  Settings,
-  HelpCircle,
-  Search,
-  ChevronDown
-} from "lucide-react";
-// Import the custom button you already built!
-import Button from "./ui/Button"; 
+import { useLocation } from "react-router-dom";
+import { Search, Bell, User } from "lucide-react";
+import Button from "./ui/Button";
+import LogoutButton from "./LogoutButton";
 
-export default function Sidebar() {
+export default function Navbar() {
+  // 1. Grab the current URL path
+  const location = useLocation();
+
+  // 2. A "dictionary" that maps the current URL to the correct text and buttons
+  const pageConfig: Record<string, { title: string; subtitle: string; actionText: string | null }> = {
+    "/admin": {
+      title: "Dashboard",
+      subtitle: "Overview of your field operations",
+      actionText: null, // No button on the main dashboard
+    },
+    "/admin/jobs": {
+      title: "Jobs",
+      subtitle: "Manage and monitor all jobs and service requests",
+      actionText: "+ Add Job",
+    },
+    "/admin/technicians": {
+      title: "Technicians",
+      subtitle: "Manage your field technician team",
+      actionText: "+ Add Technician",
+    },
+    "/admin/clients": {
+      title: "Clients",
+      subtitle: "Manage customer accounts",
+      actionText: "+ Add Client",
+    },
+  };
+
+  // 3. Look up the current page config, with a safe fallback if the URL isn't in our dictionary
+  const currentConfig = pageConfig[location.pathname] || {
+    title: "Admin Panel",
+    subtitle: "Manage your system settings",
+    actionText: null,
+  };
+
   return (
-    <aside className="w-64 min-h-screen flex flex-col bg-bg-dark text-fg font-sans border-r border-border-muted">
+    <header className="h-16 px-8 bg-bg-base border-b border-border-muted flex items-center justify-between sticky top-0 z-40">
       
-      {/* Logo Section */}
-      <div className="flex items-center gap-3 p-6 pb-8">
-        <div className="w-8 h-8 bg-bg-light border border-border-muted rounded-full shrink-0"></div>
-        <h1 className="text-xl font-bold tracking-wide">FieldSync</h1>
+      {/* Left Side: Dynamic Page Title & Subtitle */}
+      <div>
+        <h1 className="text-2xl font-bold text-fg tracking-tight">
+          {currentConfig.title}
+        </h1>
+        <p className="text-sm text-fg-muted mt-1">
+          {currentConfig.subtitle}
+        </p>
       </div>
 
-      {/* Main Menu */}
-      <div className="px-6 space-y-4">
-        <h2 className="text-[10px] font-bold text-fg-muted uppercase tracking-wider mb-2">
-          Menu
-        </h2>
-        <nav className="space-y-4">
-          <NavItem icon={<LayoutDashboard size={20} />} label="Dashboard" />
-          <NavItem icon={<Briefcase size={20} />} label="Jobs" />
-          <NavItem icon={<Users size={20} />} label="Technicians" />
-          <NavItem icon={<Settings size={20} />} label="Setting" />
-          <NavItem icon={<HelpCircle size={20} />} label="Help" />
-        </nav>
-      </div>
+      {/* Right Side: Actions, Search, and Profile */}
+      <div className="flex items-center gap-6">
+        
+        {/* Dynamic Action Button (Only renders if actionText exists for this page) */}
+        {currentConfig.actionText && (
+          <Button variant="primary" className="py-2">
+            {currentConfig.actionText}
+          </Button>
+        )}
 
-      {/* Divider */}
-      <div className="mt-8 mb-6 border-t border-border-muted mx-6"></div>
+        {/* Vertical Divider */}
+        <div className="h-8 w-px bg-border-muted mx-2"></div>
+         
+         <LogoutButton/>
 
-      {/* Technician Filters */}
-      <div className="px-6 flex-1">
-        <h2 className="text-[10px] font-bold text-fg-muted uppercase tracking-wider mb-4">
-          Technician Filters
-        </h2>
+        {/* Search Icon / Button */}
+        <button className="text-fg-muted hover:text-primary transition-colors bg-bg-light p-2.5 rounded-full border border-border-muted">
+          <Search size={20} />
+        </button>
 
-        <div className="space-y-4">
-          {/* Search Input */}
-          <div className="space-y-1.5">
-            <label className="text-sm font-medium text-fg">Search</label>
-            <div className="relative">
-              <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-primary" />
-              <input
-                type="text"
-                placeholder="Search jobs..."
-                className="w-full bg-bg-base border border-border text-sm text-fg rounded-md py-2.5 pl-9 pr-3 focus:outline-none focus:ring-1 focus:ring-primary placeholder:text-fg-muted transition-colors"
-              />
-            </div>
+        {/* Notifications */}
+        <button className="text-fg-muted hover:text-primary transition-colors bg-bg-light p-2.5 rounded-full border border-border-muted">
+          <Bell size={20} />
+        </button>
+
+        {/* Admin Profile */}
+        <div className="flex items-center gap-3 pl-2">
+          <div className="w-10 h-10 bg-primary/20 text-primary rounded-full flex items-center justify-center border border-primary/30">
+            <User size={20} />
           </div>
-
-          {/* Dropdown Filters */}
-          <FilterSelect label="Status" placeholder="All Status" />
-          <FilterSelect label="Technician" placeholder="All Technicians" />
-          <FilterSelect label="Priority" placeholder="All Priorities" />
+          <div className="hidden md:block">
+            <p className="text-sm font-bold text-fg leading-tight">Admin</p>
+            <p className="text-xs text-fg-muted">admin@fieldsync.com</p>
+          </div>
         </div>
+
       </div>
-
-      {/* Apply Filters Button using your Component Library */}
-      <div className="p-6">
-        <Button variant="primary" className="w-full">
-          Apply Filters
-        </Button>
-      </div>
-      
-    </aside>
-  );
-}
-
-// --- Helper Components ---
-
-function NavItem({ icon, label }: { icon: React.ReactNode; label: string }) {
-  return (
-    <a
-      href="#"
-      className="flex items-center gap-3 text-fg-muted hover:text-fg transition-colors group"
-    >
-      <span className="text-fg-muted group-hover:text-primary transition-colors">
-        {icon}
-      </span>
-      <span className="font-medium text-sm">{label}</span>
-    </a>
-  );
-}
-
-function FilterSelect({ label, placeholder }: { label: string; placeholder: string }) {
-  return (
-    <div className="space-y-1.5">
-      <label className="text-sm font-medium text-fg">{label}</label>
-      <div className="relative">
-        <select className="w-full bg-bg-base border border-border text-sm text-fg rounded-md py-2.5 pl-3 pr-10 appearance-none focus:outline-none focus:ring-1 focus:ring-primary transition-colors cursor-pointer">
-          <option value="">{placeholder}</option>
-        </select>
-        <ChevronDown size={16} className="absolute right-3 top-1/2 -translate-y-1/2 text-primary pointer-events-none" />
-      </div>
-    </div>
+    </header>
   );
 }

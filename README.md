@@ -1,59 +1,40 @@
-# FieldSync — Web Client
+# FieldSync UI/UX Development Log
 
-This is the frontend client for FieldSync. It serves as the primary interface for both Technicians in the field and Administrators in the office. 
+## 🏗 Architectural Foundation
 
-If the server is the "kitchen" that handles the data and business logic, this React application is the "dining area" where users interact with the system.
+We established a robust, scalable layout system using **React Router** and **Tailwind CSS**. 
 
----
+* **`AdminLayout.tsx`:** Configured the core "Picture Frame" layout. Implemented a fixed, non-scrolling sidebar on the left, and a dynamic scrolling content area on the right. 
+* **Routing Strategy:** Successfully mapped the layout's `<Outlet />` to our protected Admin routes, ensuring the navigation frame stays persistent while page content swaps dynamically based on the URL.
 
-## 🛠 Tech Stack & Styling
+## 🧱 Core Components
 
-- **Framework:** React
-- **Build Tool:** Vite
-- **Styling:** Tailwind CSS v4
-- **Design System:** Custom high-saturation OKLCH color theme (defined in `src/styles/globals.css`). 
+* **`Sidebar.tsx`:** * Refactored from hardcoded HTML to modular React components.
+  * Replaced static anchors with React Router `<Link>` components for SPA (Single Page Application) navigation.
+  * Extracted recurring UI elements into internal helper components (`<NavItem />`, `<FilterSelect />`) to keep the codebase DRY.
+* **`Navbar.tsx`:** * Built a "Smart Header" utilizing the `useLocation()` hook.
+  * Created a routing dictionary (`pageConfig`) so the Navbar automatically updates its Title, Subtitle, and Call-to-Action buttons based on the active route.
+* **`StatusBadge.tsx`:** * Upgraded the component's TypeScript definitions and visual dictionary to support both Job statuses (`success`, `pending`, `in-progress`) and Technician statuses (`available`, `unavailable`).
+  * Implemented `whitespace-nowrap` to ensure badges never break across multiple lines on smaller screens.
 
-The application utilizes native Tailwind v4 `@theme` variables to ensure perfectly consistent foregrounds, backgrounds, borders, and semantic status colors across the entire platform.
+## 📄 Main Dashboard Pages
 
----
+### 1. The Command Center (`Dashboard.tsx`)
+Completely overhauled to match the custom FieldSync brand mockup.
+* **Theme:** Implemented the custom dark forest green (`#1A3B31`) background wrapper for the header and sidebar areas.
+* **Summary Cards:** Built a top row of responsive statistic cards tracking Total Jobs, Active Techs, Pending, and Completed metrics with trend indicators.
+* **Widget Grid:** Utilized a split 12-column grid for the lower section:
+  * **Left (8-cols):** Recent Jobs table featuring a dropdown filter, search input, and custom column alignment.
+  * **Right (4-cols):** Technician Activity feed displaying availability and current job loads, complete with UI skeleton loaders for unpopulated data.
+* **Quick Actions:** Added a dedicated grid for fast execution (Add Job, Add Technician, Generate Report).
 
-## 🧱 UI Component Library
+### 2. The Jobs Manager (`Jobs.tsx`)
+* **Master-Detail Layout:** Engineered a split-screen view. The left side displays all data, and the right panel dynamically reveals details when a row is clicked.
+* **12-Column Data Table:** Replaced rigid flex layouts with a mathematically precise `grid-cols-12` structure (`3+2+3+2+2`) to ensure perfect visual alignment between table headers and data rows.
+* **Interactive State:** Utilized `useState` (`selectedJob`) to manage which job is currently being viewed.
+* **Conditional UI:** Implemented ternary operators in the detail panel to dynamically swap between displaying an assigned technician's name or an interactive `+ Assign Tech` button.
 
-To maintain strict design consistency and keep the codebase clean, this project relies on a custom-built suite of highly reusable foundational UI components located in `src/components/ui/`. 
-
-These components abstract away complex Tailwind strings and manage their own internal accessibility attributes.
-
-### 1. `<Button />`
-A fully accessible, multi-variant button component extending standard HTML button attributes.
-- **Variants:** `primary`, `secondary`, `danger`, `ghost`
-- **Sizes:** `small`, `medium`, `large`
-- **Features:** Built-in `isLoading` state that automatically disables the button and injects an animated SVG spinner.
-
-### 2. `<Input />`
-A form input wrapper built with React's `forwardRef` to ensure compatibility with modern form-handling libraries.
-- **Features:** - Auto-generates unique IDs using `useId()` for perfect label-to-input accessibility mapping.
-  - Built-in `error` state that automatically renders validation messages and updates border colors to `--color-danger`.
-  - Supports a `rightElement` prop (Adornment pattern) for seamless injection of icons, such as password visibility toggles.
-
-### 3. `<StatusBadge />`
-A domain-specific visual indicator (located in `src/components/StatusBadge.tsx`) used to communicate job states across dashboards and lists.
-- **Supported Statuses:** `success`, `pending`, `error`, `in-progress`
-- **Features:** Utilizes a dictionary pattern to instantly map database status strings to the correct OKLCH semantic colors. Automatically parses and formats backend strings (e.g., converting "in-progress" to "In Progress").
-
----
-
-## 🚀 Core Features Implemented
-
-- **Authentication Layout:** A responsive, split-screen `AuthLayout` that integrates the custom `<Input />` and `<Button />` components. 
-- **State Management:** Uses a custom `useLoginRedirect` hook to securely handle email/password submission, loading states, and error boundary rendering without triggering page reloads.
-
----
-
-## 💻 Local Development
-
-To run the FieldSync client on your local machine:
-
-1. Ensure you are in the `client/` directory.
-2. Install the necessary dependencies:
-   ```bash
-   npm install
+### 3. The Technician Roster (`Technicians.tsx`)
+* **Interactive List:** Applied the same successful 12-column grid and `useState` architecture as the Jobs page for consistent UX.
+* **Assignment Panel:** Built out the right-hand detail view to include a mock assignment form (Job Select, Priority, Deadline, Instructions) for rapid dispatching.
+* **Empty States:** Created user-friendly empty state screens (e.g., "No Technician Selected") featuring dimmed icons and instructional text when the `selectedTech` state is null.

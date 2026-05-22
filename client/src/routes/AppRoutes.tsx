@@ -34,7 +34,6 @@ export default function AppRoutes(){
       {/* AUTH */}
       <Route element={<AuthLayout />}>
         <Route path="/login" element={<Login />} />
-      
       </Route>
              
 
@@ -49,11 +48,13 @@ export default function AppRoutes(){
           </ProtectedRoute>
         }
       >
+
         <Route index element={<AdminDashboard />} />
         <Route path="jobs" element={<Jobs />} />
         <Route path="jobs/:id" element={<JobDetail />} />
         <Route path="technicians" element={<Technicians />} />
         <Route path="clients" element={<Clients />} />
+        
       </Route>
 
       {/* TECHNICIAN */}

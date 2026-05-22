@@ -1,7 +1,7 @@
 import React from "react";
 
 // 1. Strictly type the statuses based on the project brief
-export type JobStatus = "success" | "pending" | "error" | "in-progress";
+export type JobStatus = "success" | "pending" | "error" | "in-progress"| "available" | "unavailable";
 
 interface StatusBadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
   status: JobStatus;
@@ -16,9 +16,11 @@ export default function StatusBadge({
   // 2. Dictionary Pattern mapping statuses to your specific OKLCH colors
   const variants = {
     "success": "bg-success text-bg-light",
-    "pending": "bg-warning text-fg", // Warning (yellows) usually need dark text for contrast
+    "pending": "bg-warning text-fg",
     "error": "bg-danger text-bg-light",
     "in-progress": "bg-info text-bg-light",
+    "available": "bg-success text-bg-light",
+    "unavailable": "bg-danger text-bg-light",
   };
 
   // 3. Helper function to format the text dynamically

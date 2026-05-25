@@ -1,7 +1,7 @@
 import React from "react";
 
 // 1. Strictly type the statuses based on the project brief
-export type JobStatus = "success" | "pending" | "error" | "in-progress"| "available" | "unavailable";
+export type JobStatus = "success" | "pending" | "error" | "in-progress"| "available" | "unavailable" | "completed";
 
 interface StatusBadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
   status: JobStatus;
@@ -21,6 +21,7 @@ export default function StatusBadge({
     "in-progress": "bg-info text-bg-light",
     "available": "bg-success text-bg-light",
     "unavailable": "bg-danger text-bg-light",
+    "completed": "bg-gray-400 text-bg-light"
   };
 
   // 3. Helper function to format the text dynamically

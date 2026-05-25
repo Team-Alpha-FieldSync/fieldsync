@@ -1,5 +1,15 @@
 import { useState } from "react";
-import { Calendar, Clock, MapPin, AlertCircle, UserPlus, CheckCircle, Trash2, Edit } from "lucide-react";
+import { 
+  Calendar, 
+  Clock, 
+  MapPin, 
+  AlertCircle, 
+  UserPlus, 
+  CheckCircle, 
+  Trash2, 
+  Edit,
+  ChevronLeft // <-- Added for the mobile "Back" button
+} from "lucide-react";
 import Button from "../../components/ui/Button";
 import StatusBadge from "../../components/StatusBadge";
 
@@ -58,46 +68,53 @@ const mockJobs: Job[] = [
 ];
 
 export default function Jobs() {
-  // 3. State to track the currently clicked job
   const [selectedJob, setSelectedJob] = useState<Job | null>(null);
 
   return (
-    <div className="flex gap-6 h-full">
+    // Switched to xl:flex-row to stack panels on mobile, side-by-side on desktop
+    // Shrunk padding on mobile
+    <div className="flex flex-col xl:flex-row gap-4 xl:gap-6 h-full p-4 xl:p-6">
       
-
-      {/* LEFT PANEL: All Jobs List                 */}
-      <div className="flex-2 bg-bg-base border border-border-muted rounded-xl shadow-sm overflow-hidden flex flex-col">
-        <div className="p-6 border-b border-border-muted flex justify-between items-center">
-          <h2 className="text-xl font-bold text-fg">All Jobs ({mockJobs.length})</h2>
+      {/* ========================================== */}
+      {/* LEFT PANEL: All Jobs List                  */}
+      {/* ========================================== */}
+      {/* Hidden on mobile if a job is selected. Visible on desktop always. */}
+      <div className={`${selectedJob ? 'hidden xl:flex' : 'flex'} flex-col xl:flex-[2] bg-bg-base border border-border-muted rounded-xl shadow-sm overflow-hidden h-full`}>
+        <div className="p-4 xl:p-6 border-b border-border-muted flex justify-between items-center">
+          <h2 className="text-lg xl:text-xl font-bold text-fg">All Jobs ({mockJobs.length})</h2>
         </div>
 
-        {/* 12-Column Table Headers */}
-        <div className="grid grid-cols-12 gap-4 px-6 py-3 bg-bg-light border-b border-border-muted text-xs font-bold text-fg-muted uppercase tracking-wider">
-          {/* Changed from 4 to 3 */}
+        {/* 12-Column Table Headers (Hidden on Mobile) */}
+        <div className="hidden xl:grid grid-cols-12 gap-4 px-6 py-3 bg-bg-light border-b border-border-muted text-xs font-bold text-fg-muted uppercase tracking-wider">
           <div className="col-span-3">Job Info</div>
           <div className="col-span-2">Client</div>
           <div className="col-span-3">Assigned Tech</div>
           <div className="col-span-2">Timeline</div>
-          {/* Changed from 1 to 2, removed weird padding */}
           <div className="col-span-2 text-right">Status</div> 
         </div>
 
-
-        {/* UPGRADED: Technician List Rows            */}
+        {/* List Rows */}
         <div className="divide-y divide-border-muted overflow-y-auto">
           {mockJobs.map((job) => (
             <div 
               key={job.id}
               onClick={() => setSelectedJob(job)}
-              className={`grid grid-cols-12 gap-4 px-6 py-4 items-center cursor-pointer transition-colors hover:bg-bg-light ${
+              // Mobile: Stacked cards. Desktop: 12-Col Grid
+              className={`flex flex-col xl:grid xl:grid-cols-12 gap-3 xl:gap-4 p-4 xl:px-6 xl:py-4 xl:items-center cursor-pointer transition-colors hover:bg-bg-light ${
                 selectedJob?.id === job.id ? "bg-primary/5 border-l-4 border-l-primary" : "border-l-4 border-l-transparent"
               }`}
             >
-              {/* Job Info Col (Now 3/12) */}
-              <div className="col-span-3 pr-2 overflow-hidden">
-                <div className="flex items-center gap-2 mb-1">
-                  <span className="text-xs font-bold text-primary">{job.id}</span>
-                  {job.priority === "High" && <AlertCircle size={12} className="text-danger shrink-0" />}
+              {/* Job Info Col */}
+              <div className="xl:col-span-3 xl:pr-2 overflow-hidden w-full">
+                <div className="flex justify-between items-start w-full mb-1">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-bold text-primary">{job.id}</span>
+                    {job.priority === "High" && <AlertCircle size={12} className="text-danger shrink-0" />}
+                  </div>
+                  {/* Mobile Status Badge */}
+                  <div className="xl:hidden shrink-0">
+                    <StatusBadge status={job.status} />
+                  </div>
                 </div>
                 <p className="font-bold text-sm text-fg truncate">{job.title}</p>
                 <p className="text-xs text-fg-muted flex items-center gap-1 mt-1 truncate">
@@ -105,21 +122,23 @@ export default function Jobs() {
                 </p>
               </div>
               
-              {/* Client Col (2/12) */}
-              <div className="col-span-2 text-sm text-fg truncate">
+              {/* Client Col */}
+              <div className="xl:col-span-2 text-sm text-fg truncate flex items-center gap-2">
+                <span className="text-xs font-bold text-fg-muted uppercase xl:hidden">Client:</span>
                 {job.client.name}
               </div>
               
-              {/* Tech Col (3/12) */}
-              <div className="col-span-3">
+              {/* Tech Col */}
+              <div className="xl:col-span-3 flex items-center gap-2">
+                <span className="text-xs font-bold text-fg-muted uppercase xl:hidden">Tech:</span>
                 {job.assignedTech ? (
-                  <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 rounded-full bg-border flex items-center justify-center text-xs text-fg-muted font-bold shrink-0">
+                  <div className="flex items-center gap-2 w-full overflow-hidden">
+                    <div className="w-6 h-6 xl:w-8 xl:h-8 rounded-full bg-border flex items-center justify-center text-[10px] xl:text-xs text-fg-muted font-bold shrink-0">
                       {job.assignedTech.name.charAt(0)}
                     </div>
                     <div className="overflow-hidden">
                       <p className="text-sm font-medium text-fg truncate">{job.assignedTech.name}</p>
-                      <p className="text-xs text-fg-muted truncate">{job.assignedTech.id}</p>
+                      <p className="hidden xl:block text-xs text-fg-muted truncate">{job.assignedTech.id}</p>
                     </div>
                   </div>
                 ) : (
@@ -127,8 +146,8 @@ export default function Jobs() {
                 )}
               </div>
 
-              {/* Timeline Col (2/12) */}
-              <div className="col-span-2 space-y-1">
+              {/* Timeline Col */}
+              <div className="xl:col-span-2 flex flex-row xl:flex-col gap-4 xl:gap-1 mt-2 xl:mt-0">
                 <div className="flex items-center gap-1.5 text-xs text-fg-muted truncate">
                   <Calendar size={12} className="shrink-0" /> {job.dateCreated}
                 </div>
@@ -137,18 +156,20 @@ export default function Jobs() {
                 </div>
               </div>
 
-              {/* Status Col (Now 2/12 - plenty of room for "In Progress"!) */}
-              <div className="col-span-2 flex justify-end">
+              {/* Status Col (Desktop Only) */}
+              <div className="hidden xl:flex col-span-2 justify-end">
                 <StatusBadge status={job.status} />
               </div>
             </div>
           ))}
         </div>
-        </div>
+      </div>
 
- 
-      {/* RIGHT PANEL: Job Details                  */}
-      <div className="flex-1 bg-bg-base border border-border-muted rounded-xl shadow-sm overflow-hidden flex flex-col">
+      {/* ========================================== */}
+      {/* RIGHT PANEL: Job Details                   */}
+      {/* ========================================== */}
+      {/* Hidden on mobile if NO job is selected. Visible on desktop always. */}
+      <div className={`${!selectedJob ? 'hidden xl:flex' : 'flex'} flex-col xl:flex-1 bg-bg-base border border-border-muted rounded-xl shadow-sm overflow-hidden h-full`}>
         
         {!selectedJob ? (
           <div className="p-12 flex flex-col items-center justify-center text-center h-full text-fg-muted">
@@ -160,50 +181,65 @@ export default function Jobs() {
           <div className="flex flex-col h-full">
             
             {/* Detail Header */}
-            <div className="p-6 border-b border-border-muted flex justify-between items-center bg-bg-light/50">
-              <div className="flex items-center gap-3">
+            <div className="p-4 xl:p-6 border-b border-border-muted flex justify-between items-center bg-bg-light/50">
+              <div className="flex items-center gap-2 xl:gap-3">
+                {/* Mobile Back Button */}
+                <button 
+                  onClick={() => setSelectedJob(null)}
+                  className="xl:hidden p-1.5 -ml-2 rounded-lg text-fg-muted hover:bg-border-muted transition-colors"
+                >
+                  <ChevronLeft size={24} />
+                </button>
                 <h2 className="font-bold text-lg text-primary">{selectedJob.id}</h2>
-                <StatusBadge status={selectedJob.status} />
+                <div className="hidden sm:block"><StatusBadge status={selectedJob.status} /></div>
               </div>
-              <span className={`text-xs font-bold ${
-                selectedJob.priority === 'High' ? 'text-danger' : 
-                selectedJob.priority === 'Medium' ? 'text-yellow-500' : 'text-success'
+              <span className={`text-xs font-bold px-2 py-1 rounded border ${
+                selectedJob.priority === 'High' ? 'text-danger border-danger/20 bg-danger/5' : 
+                selectedJob.priority === 'Medium' ? 'text-yellow-600 border-yellow-600/20 bg-yellow-600/5' : 
+                'text-success border-success/20 bg-success/5'
               }`}>
-                {selectedJob.priority} Priority
+                {selectedJob.priority} <span className="hidden sm:inline">Priority</span>
               </span>
             </div>
 
-            <div className="p-6 space-y-6 overflow-y-auto">
+            <div className="p-4 xl:p-6 space-y-6 overflow-y-auto">
               
+              {/* Mobile Status Badge (Moved here for small screens) */}
+              <div className="sm:hidden mb-4">
+                 <StatusBadge status={selectedJob.status} />
+              </div>
+
               {/* Title & Meta Info */}
               <div>
                 <h3 className="font-bold text-xl text-fg mb-4">{selectedJob.title}</h3>
-                <div className="grid grid-cols-3 gap-4 border-y border-border-muted py-4">
-                  <div>
-                    <p className="text-xs text-fg-muted mb-1">Field / Category</p>
+                
+                {/* Switches to 1 col on small phones, 3 cols on SM+ screens */}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 border-y border-border-muted py-4">
+                  <div className="flex sm:block items-center justify-between">
+                    <p className="text-xs text-fg-muted sm:mb-1">Field / Category</p>
                     <p className="text-sm font-medium text-fg">{selectedJob.category}</p>
                   </div>
-                  <div>
-                    <p className="text-xs text-fg-muted mb-1">Created</p>
+                  <div className="flex sm:block items-center justify-between">
+                    <p className="text-xs text-fg-muted sm:mb-1">Created</p>
                     <p className="text-sm font-medium text-fg">{selectedJob.dateCreated}</p>
                   </div>
-                  <div>
-                    <p className="text-xs text-fg-muted mb-1">Deadline</p>
+                  <div className="flex sm:block items-center justify-between">
+                    <p className="text-xs text-fg-muted sm:mb-1">Deadline</p>
                     <p className="text-sm font-medium text-fg">{selectedJob.deadline}</p>
                   </div>
                 </div>
               </div>
 
               {/* Assignment Boxes */}
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {/* Client Box */}
-                <div className="bg-bg-light border border-border-muted p-4 rounded-lg flex flex-col items-center justify-center text-center min-h-25">
+                <div className="bg-bg-light border border-border-muted p-4 rounded-lg flex flex-col items-center justify-center text-center sm:min-h-[100px]">
                   <p className="text-xs text-fg-muted mb-1">Client</p>
                   <p className="text-sm font-bold text-fg">{selectedJob.client.name}</p>
                 </div>
                 
                 {/* Technician Box */}
-                <div className="bg-bg-light border border-border-muted p-4 rounded-lg flex flex-col items-center justify-center text-center min-h-25 hover:border-primary transition-colors cursor-pointer group">
+                <div className="bg-bg-light border border-border-muted p-4 rounded-lg flex flex-col items-center justify-center text-center sm:min-h-[100px] hover:border-primary transition-colors cursor-pointer group">
                   {selectedJob.assignedTech ? (
                     <>
                       <p className="text-xs text-fg-muted mb-1">Technician</p>
@@ -227,7 +263,7 @@ export default function Jobs() {
               </div>
 
               {/* Action Buttons */}
-              <div className="pt-4 border-t border-border-muted grid grid-cols-2 gap-3">
+              <div className="pt-4 border-t border-border-muted grid grid-cols-1 sm:grid-cols-2 gap-3 pb-8 xl:pb-0">
                 <Button variant="secondary" className="w-full justify-center">
                   <Edit size={16} className="mr-2" /> Edit Details
                 </Button>

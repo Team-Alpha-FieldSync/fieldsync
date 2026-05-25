@@ -21,12 +21,11 @@ import AdminDashboard from "../pages/admin/Dashboard";
 import Jobs from "../pages/admin/Jobs";
 import JobDetail from "../pages/admin/JobDetail";
 import Technicians from "../pages/admin/Technicians";
-import Clients from "../pages/admin/Clients";
 
 // technician pages
 import TechDashboard from "../pages/technician/Dashboard";
 import TechJobDetail from "../pages/technician/JobDetail";
-
+import TechnicianJobs from "../pages/technician/TechnicianJobs";
 
 export default function AppRoutes(){
   return (
@@ -53,8 +52,7 @@ export default function AppRoutes(){
         <Route path="jobs" element={<Jobs />} />
         <Route path="jobs/:id" element={<JobDetail />} />
         <Route path="technicians" element={<Technicians />} />
-        <Route path="clients" element={<Clients />} />
-        
+
       </Route>
 
       {/* TECHNICIAN */}
@@ -69,7 +67,9 @@ export default function AppRoutes(){
         }
       >
         <Route index element={<TechDashboard />} />
+        <Route path="jobs" element={<TechnicianJobs />} />
         <Route path="jobs/:id" element={<TechJobDetail />} />
+        
       </Route>
 
       {/* COMMON */}

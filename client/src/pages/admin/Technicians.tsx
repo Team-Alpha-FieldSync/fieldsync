@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { Zap, Edit, Briefcase, UserX } from "lucide-react";
+import { Zap, Edit, Briefcase, UserX, ChevronLeft } from "lucide-react";
 import Button from "../../components/ui/Button";
-import StatusBadge from "../../components/StatusBadge"; // Assuming this is your custom badge
+import StatusBadge from "../../components/StatusBadge"; 
 
 // 1. Define what a Technician looks like
 type Technician = {
@@ -21,7 +21,7 @@ type Technician = {
   phone: string;
 };
 
-// 2. Mock Data (This will eventually come from your backend!)
+// 2. Mock Data
 const mockTechnicians: Technician[] = [
   {
     id: "TCH 1001",
@@ -46,82 +46,92 @@ const mockTechnicians: Technician[] = [
 ];
 
 export default function Technicians() {
-  // 3. The Magic State: Keeps track of who is currently clicked!
-  // Starts as 'null' meaning nobody is selected yet.
   const [selectedTech, setSelectedTech] = useState<Technician | null>(null);
 
   return (
-    <div className="flex gap-6 h-full">
-      {/* LEFT PANEL: All Technicians List          */}
-      <div className="flex-2 bg-bg-base border border-border-muted rounded-xl shadow-sm overflow-hidden flex flex-col">
-        <div className="p-6 border-b border-border-muted">
-          <h2 className="text-xl font-bold text-fg">
+    // Switched to flex-col for mobile, xl:flex-row for desktop. Shrunk padding for mobile.
+    <div className="flex flex-col xl:flex-row gap-4 xl:gap-6 h-full p-4 xl:p-6">
+      
+      {/* ========================================== */}
+      {/* LEFT PANEL: All Technicians List           */}
+      {/* ========================================== */}
+      {/* Hidden on mobile if a tech is selected. Visible on desktop always. */}
+      <div className={`${selectedTech ? 'hidden xl:flex' : 'flex'} flex-col xl:flex-[2] bg-bg-base border border-border-muted rounded-xl shadow-sm overflow-hidden h-full`}>
+        <div className="p-4 xl:p-6 border-b border-border-muted">
+          <h2 className="text-lg xl:text-xl font-bold text-fg">
             All Technicians ({mockTechnicians.length})
           </h2>
         </div>
 
-        {/* UPGRADED: 12-Column Table Headers */}
-        <div className="grid grid-cols-12 gap-4 px-6 py-3 bg-bg-light border-b border-border-muted text-xs font-bold text-fg-muted uppercase tracking-wider">
+        {/* Desktop 12-Column Table Headers - Hidden on Mobile */}
+        <div className="hidden xl:grid grid-cols-12 gap-4 px-6 py-3 bg-bg-light border-b border-border-muted text-xs font-bold text-fg-muted uppercase tracking-wider">
           <div className="col-span-4">Technician</div>
-          {/* Centered ID Header */}
           <div className="col-span-2 text-center">ID</div>
           <div className="col-span-2">Specialization</div>
           <div className="col-span-3">Current Assignment</div>
           <div className="col-span-1 flex justify-end pr-4">Status</div>
         </div>
 
-        {/* Technician List */}
+        {/* Technician List Rows */}
         <div className="divide-y divide-border-muted overflow-y-auto">
           {mockTechnicians.map((tech) => (
             <div
               key={tech.id}
               onClick={() => setSelectedTech(tech)}
-              className={`grid grid-cols-12 gap-4 px-6 py-4 items-center cursor-pointer transition-colors hover:bg-bg-light ${
+              // Stacked flex on mobile, 12-col grid on desktop
+              className={`flex flex-col xl:grid xl:grid-cols-12 gap-3 xl:gap-4 p-4 xl:px-6 xl:py-4 xl:items-center cursor-pointer transition-colors hover:bg-bg-light ${
                 selectedTech?.id === tech.id
                   ? "bg-primary/5 border-l-4 border-l-primary"
                   : "border-l-4 border-l-transparent"
               }`}
             >
-              {/* Profile Col (Gets 4/12 slices of space) */}
-              <div className="col-span-4 flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-border flex items-center justify-center text-fg-muted font-bold">
-                  {tech.name.charAt(0)}
+              {/* Profile Col */}
+              <div className="xl:col-span-4 flex items-start xl:items-center justify-between xl:justify-start gap-3 w-full xl:w-auto">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-border flex items-center justify-center text-fg-muted font-bold shrink-0">
+                    {tech.name.charAt(0)}
+                  </div>
+                  <div className="overflow-hidden">
+                    <p className="font-bold text-sm text-fg truncate">{tech.name}</p>
+                    <p className="text-xs text-fg-muted truncate">{tech.email}</p>
+                  </div>
                 </div>
-                <div>
-                  <p className="font-bold text-sm text-fg">{tech.name}</p>
-                  <p className="text-xs text-fg-muted">{tech.email}</p>
+                {/* Mobile Status Badge (Hidden on Desktop) */}
+                <div className="xl:hidden shrink-0">
+                  <StatusBadge status={tech.status} />
                 </div>
               </div>
 
-              {/* ID Col (Gets 2/12 slices, perfectly centered text) */}
-              <div className="col-span-2 text-center text-sm text-fg-muted">
+              {/* ID Col */}
+              <div className="xl:col-span-2 text-sm text-fg-muted xl:text-center mt-1 xl:mt-0 flex xl:block items-center gap-2">
+                <span className="xl:hidden text-xs font-bold uppercase tracking-wider">ID:</span>
                 {tech.id}
               </div>
 
-              {/* Specialization Col (Gets 2/12 slices) */}
-              <div className="col-span-2 flex items-center gap-1.5 text-sm text-fg">
-                <Zap size={14} className="text-yellow-500" />
+              {/* Specialization Col */}
+              <div className="xl:col-span-2 flex items-center gap-1.5 text-sm text-fg">
+                <Zap size={14} className="text-yellow-500 shrink-0" />
                 {tech.specialization}
               </div>
 
-              {/* Assignment Col (Gets 3/12 slices) */}
-              <div className="col-span-3">
+              {/* Assignment Col */}
+              <div className="xl:col-span-3 mt-1 xl:mt-0 bg-bg-light xl:bg-transparent p-2 xl:p-0 rounded-md xl:rounded-none border border-border-muted xl:border-transparent">
                 {tech.assignment ? (
                   <div>
-                    <p className="text-sm font-medium text-fg">
+                    <p className="text-sm font-medium text-fg truncate">
                       {tech.assignment.title}
                     </p>
-                    <p className="text-xs text-fg-muted">
+                    <p className="text-xs text-fg-muted truncate">
                       {tech.assignment.jobId}
                     </p>
                   </div>
                 ) : (
-                  <p className="text-sm text-fg-muted">Unassigned</p>
+                  <p className="text-sm text-fg-muted italic">Unassigned</p>
                 )}
               </div>
 
-              {/* Status Col (Gets 1/12 slice, pushed to the right) */}
-              <div className="col-span-1 flex justify-end pr-4">
+              {/* Desktop Status Col (Hidden on Mobile) */}
+              <div className="hidden xl:flex col-span-1 justify-end pr-4">
                 <StatusBadge status={tech.status} />
               </div>
             </div>
@@ -129,9 +139,12 @@ export default function Technicians() {
         </div>
       </div>
 
-      {/* RIGHT PANEL: Technician Details           */}
-      <div className="flex-1 bg-bg-base border border-border-muted rounded-xl shadow-sm overflow-hidden flex flex-col">
-        {/* Conditional Rendering: If NO tech is selected */}
+      {/* ========================================== */}
+      {/* RIGHT PANEL: Technician Details            */}
+      {/* ========================================== */}
+      {/* Hidden on mobile if NO tech is selected. Visible on desktop always. */}
+      <div className={`${!selectedTech ? 'hidden xl:flex' : 'flex'} flex-col xl:flex-1 bg-bg-base border border-border-muted rounded-xl shadow-sm overflow-hidden h-full`}>
+        
         {!selectedTech ? (
           <div className="p-12 flex flex-col items-center justify-center text-center h-full text-fg-muted">
             <UserX size={48} className="mb-4 opacity-50" />
@@ -144,53 +157,62 @@ export default function Technicians() {
             </p>
           </div>
         ) : (
-          /* Conditional Rendering: If a tech IS selected */
           <div className="flex flex-col h-full">
-            <div className="p-6 border-b border-border-muted flex justify-between items-center">
-              <h2 className="font-bold text-lg text-fg">Technician details</h2>
+            
+            {/* Header */}
+            <div className="p-4 xl:p-6 border-b border-border-muted flex justify-between items-center">
+              <div className="flex items-center gap-2 xl:gap-0">
+                {/* Mobile Back Button */}
+                <button 
+                  onClick={() => setSelectedTech(null)}
+                  className="xl:hidden p-1.5 -ml-2 rounded-lg text-fg-muted hover:bg-border-muted transition-colors"
+                >
+                  <ChevronLeft size={24} />
+                </button>
+                <h2 className="font-bold text-lg text-fg">Technician Details</h2>
+              </div>
               <StatusBadge status={selectedTech.status} />
             </div>
 
-            <div className="p-6 space-y-6 overflow-y-auto">
+            <div className="p-4 xl:p-6 space-y-6 overflow-y-auto">
+              
               {/* Profile Info */}
               <div className="flex items-start gap-4">
-                <div className="w-16 h-16 rounded-full bg-border flex items-center justify-center text-xl text-fg-muted font-bold shrink-0">
+                <div className="w-14 h-14 xl:w-16 xl:h-16 rounded-full bg-border flex items-center justify-center text-xl text-fg-muted font-bold shrink-0">
                   {selectedTech.name.charAt(0)}
                 </div>
-                <div className="space-y-1">
-                  <h3 className="font-bold text-xl text-fg">
+                <div className="space-y-1 overflow-hidden">
+                  <h3 className="font-bold text-lg xl:text-xl text-fg truncate">
                     {selectedTech.name}
                   </h3>
-                  <p className="text-sm text-fg-muted">
-                    Technician ID: {selectedTech.id}
-                  </p>
-                  <p className="text-sm text-fg-muted">
-                    {selectedTech.specialization} technician
-                  </p>
-                  <p className="text-sm text-fg-muted">{selectedTech.phone}</p>
-                  <p className="text-sm text-fg-muted">{selectedTech.email}</p>
+                  <p className="text-sm text-fg-muted">ID: {selectedTech.id}</p>
+                  <p className="text-sm text-fg-muted">{selectedTech.specialization} Technician</p>
+                  <p className="text-sm text-fg-muted truncate">{selectedTech.phone}</p>
+                  <p className="text-sm text-fg-muted truncate">{selectedTech.email}</p>
                 </div>
               </div>
 
               {/* Assignment Form Panel */}
-              <div className="bg-primary/5 border border-primary/20 rounded-lg p-5">
+              <div className="bg-primary/5 border border-primary/20 rounded-lg p-4 xl:p-5">
                 <h4 className="font-bold text-fg mb-4">Assignment Panel</h4>
                 <div className="space-y-4">
                   <div>
                     <label className="block text-xs font-medium text-fg mb-1">
                       Select Job
                     </label>
-                    <select className="w-full border border-border rounded-md p-2 text-sm bg-bg-base">
+                    <select className="w-full border border-border rounded-md p-2 text-sm bg-bg-base focus:outline-none focus:border-primary">
                       <option>Select a job...</option>
                       <option>Internet connectivity failure</option>
                     </select>
                   </div>
-                  <div className="grid grid-cols-2 gap-4">
+                  
+                  {/* Grid becomes 1 col on very small screens, 2 col on SM+ */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-xs font-medium text-fg mb-1">
                         Priority
                       </label>
-                      <select className="w-full border border-border rounded-md p-2 text-sm bg-bg-base">
+                      <select className="w-full border border-border rounded-md p-2 text-sm bg-bg-base focus:outline-none focus:border-primary">
                         <option>High</option>
                         <option>Medium</option>
                         <option>Low</option>
@@ -202,42 +224,45 @@ export default function Technicians() {
                       </label>
                       <input
                         type="date"
-                        className="w-full border border-border rounded-md p-2 text-sm bg-bg-base"
+                        className="w-full border border-border rounded-md p-2 text-sm bg-bg-base focus:outline-none focus:border-primary"
                       />
                     </div>
                   </div>
+                  
                   <div>
                     <label className="block text-xs font-medium text-fg mb-1">
                       Note/ Instructions
                     </label>
                     <textarea
                       rows={3}
-                      className="w-full border border-border rounded-md p-2 text-sm bg-bg-base"
+                      className="w-full border border-border rounded-md p-2 text-sm bg-bg-base focus:outline-none focus:border-primary resize-none"
                     ></textarea>
                   </div>
-                  <Button variant="primary" className="w-full">
+                  <Button variant="primary" className="w-full py-2.5">
                     Assign Job
                   </Button>
                 </div>
               </div>
 
               {/* Quick Actions */}
-              <div className="grid grid-cols-3 gap-3">
-                <button className="flex flex-col items-center justify-center p-4 border border-border-muted rounded-lg hover:border-primary hover:text-primary transition-colors text-fg-muted">
-                  <Edit size={24} className="mb-2" />
+              {/* Stack vertically on extra small screens, side-by-side on SM+ */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <button className="flex sm:flex-col items-center justify-center gap-3 sm:gap-2 p-3 sm:p-4 border border-border-muted rounded-lg hover:border-primary hover:text-primary transition-colors text-fg-muted">
+                  <Edit size={20} className="sm:mb-1 shrink-0" />
                   <span className="text-xs font-medium">Edit Profile</span>
                 </button>
-                <button className="flex flex-col items-center justify-center p-4 border border-border-muted rounded-lg hover:border-primary hover:text-primary transition-colors text-fg-muted">
-                  <Briefcase size={24} className="mb-2" />
-                  <span className="text-xs font-medium">Jobs History</span>
+                <button className="flex sm:flex-col items-center justify-center gap-3 sm:gap-2 p-3 sm:p-4 border border-border-muted rounded-lg hover:border-primary hover:text-primary transition-colors text-fg-muted">
+                  <Briefcase size={20} className="sm:mb-1 shrink-0" />
+                  <span className="text-xs font-medium">Job History</span>
                 </button>
-                <button className="flex flex-col items-center justify-center p-4 border border-border-muted rounded-lg hover:text-danger hover:border-danger transition-colors text-fg-muted">
-                  <UserX size={24} className="mb-2" />
+                <button className="flex sm:flex-col items-center justify-center gap-3 sm:gap-2 p-3 sm:p-4 border border-border-muted rounded-lg hover:text-danger hover:border-danger transition-colors text-fg-muted bg-danger/5 sm:bg-transparent">
+                  <UserX size={20} className="sm:mb-1 shrink-0" />
                   <span className="text-xs font-medium text-center leading-tight">
-                    Deactivate account
+                    Deactivate <span className="sm:hidden">Account</span>
                   </span>
                 </button>
               </div>
+              
             </div>
           </div>
         )}

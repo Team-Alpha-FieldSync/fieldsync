@@ -2,40 +2,34 @@ import React from "react";
 import {
   LayoutDashboard,
   Briefcase,
-  Users,
   Settings,
   HelpCircle,
   Search,
-  ChevronDown,
-  X 
+  ChevronDown
 } from "lucide-react";
 import Button from "./ui/Button"; 
-import { Link } from "react-router"; 
+import { Link } from "react-router";
 import LogoutButton from "./LogoutButton";
 
-interface SidebarProps {
-  onClose?: () => void;
-}
-
-export default function Sidebar({ onClose }: SidebarProps) {
+export default function TechSidebar() {
   return (
-    // Updated classes: w-full on mobile, xl:w-64 on desktop, added overflow-y-auto and relative positioning
-    <aside className="w-full xl:w-64 h-full flex flex-col bg-bg-dark text-fg font-sans border-r border-border-muted overflow-y-auto shadow-xl xl:shadow-none relative">
+    <aside className="w-64 min-h-screen flex flex-col bg-bg-dark text-fg font-sans border-r border-border-muted">
       
-      {/* Mobile Close Button (Only renders if onClose is provided) */}
-      {onClose && (
-        <button 
-          onClick={onClose}
-          className="absolute top-4 right-4 p-2 text-fg-muted hover:text-fg xl:hidden bg-bg-base/10 rounded-full"
-        >
-          <X size={20} />
-        </button>
-      )}
-
       {/* Logo Section */}
-      <div className="flex items-center gap-3 p-6 pb-8">
+      <div className="flex items-center gap-3 p-6 pb-6">
         <div className="w-8 h-8 bg-bg-light border border-border-muted rounded-full shrink-0"></div>
         <h1 className="text-xl font-bold tracking-wide">FieldSync</h1>
+      </div>
+
+      {/* Technician Profile Section */}
+      <div className="flex flex-col items-center px-6 mb-8 text-center">
+        <img 
+          src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?fit=crop&w=150&h=150" 
+          alt="Technician" 
+          className="w-30 h-30 rounded-full object-cover border-2 border-primary mb-3 shadow-sm"
+        />
+        <h2 className="text-base font-bold text-fg">Marcus Johnson</h2>
+        <p className="text-xs font-medium text-fg-muted">Senior Technician</p>
       </div>
 
       {/* Main Menu */}
@@ -44,12 +38,10 @@ export default function Sidebar({ onClose }: SidebarProps) {
           Menu
         </h2>
         <nav className="space-y-4">
-           {/*  onClick={onClose} to automatically close the menu on mobile after navigation */}
-          <div onClick={onClose}><NavItem icon={<LayoutDashboard size={20} />} label="Dashboard" to="/admin" /></div>
-          <div onClick={onClose}><NavItem icon={<Briefcase size={20} />} label="Jobs" to="/admin/jobs" /></div>
-          <div onClick={onClose}><NavItem icon={<Users size={20} />} label="Technicians" to="/admin/technicians" /></div>
-          <div onClick={onClose}><NavItem icon={<Settings size={20} />} label="Setting" to="/admin" /></div>
-          <div onClick={onClose}><NavItem icon={<HelpCircle size={20} />} label="Help" to="/admin" /></div>
+          <NavItem icon={<LayoutDashboard size={20} />} label="Dashboard" to="/technician" />
+          <NavItem icon={<Briefcase size={20} />} label="Jobs" to="/technician/jobs" />
+          <NavItem icon={<Settings size={20} />} label="Setting" to="/technician" />
+          <NavItem icon={<HelpCircle size={20} />} label="Help" to="/technician" />
         </nav>
       </div>
 
@@ -57,7 +49,7 @@ export default function Sidebar({ onClose }: SidebarProps) {
       <div className="mt-8 mb-6 border-t border-border-muted mx-6"></div>
 
       {/* Technician Filters */}
-      <div className="px-6 flex-1 pb-4">
+      <div className="px-6 flex-1">
         <h2 className="text-[10px] font-bold text-fg-muted uppercase tracking-wider mb-4">
           Technician Filters
         </h2>
@@ -82,16 +74,15 @@ export default function Sidebar({ onClose }: SidebarProps) {
           <FilterSelect label="Priority" placeholder="All Priorities" />
         </div>
       </div>
-
-
-      {/* Apply Filters Button */}
-      <div className="p-6 pt-0 mt-auto">
+      
+      {/* Apply Filters Button using your Component Library */}
+      <div className="p-6">
         <Button variant="primary" className="w-full">
           Apply Filters
         </Button>
       </div>
       
-      <LogoutButton />
+      <LogoutButton/>
     </aside>
   );
 }

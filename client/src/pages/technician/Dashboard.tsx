@@ -7,7 +7,7 @@ import {
   ArrowRight,
   Phone
 } from "lucide-react";
-import StatusBadge from "../../components/StatusBadge"; // Adjust path as needed
+import StatusBadge from "../../components/StatusBadge"; 
 
 // --- Mock Data Tailored for a Technician ---
 const summaryStats = [

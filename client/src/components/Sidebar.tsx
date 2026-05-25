@@ -84,13 +84,15 @@ export default function Sidebar({ onClose }: SidebarProps) {
 
 
       {/* Apply Filters Button */}
-      <div className="p-6 pt-0 mt-auto">
+      <div className="p-6 pt-0 mt-auto space-y-4">
         <Button variant="primary" className="w-full">
           Apply Filters
         </Button>
+
+        <LogoutButton/>
       </div>
       
-      <LogoutButton />
+     
     </aside>
   );
 }

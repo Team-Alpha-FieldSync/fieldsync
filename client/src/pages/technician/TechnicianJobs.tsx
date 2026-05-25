@@ -67,14 +67,11 @@ export default function TechnicianJobs() {
   const [selectedJob, setSelectedJob] = useState<Job | null>(null);
 
   return (
-    // Breakpoints shifted from lg to xl to force mobile layout on tablets
     <div className="flex flex-col xl:flex-row gap-4 xl:gap-6 h-full p-4 xl:p-6">
       
-      {/* ========================================== */}
       {/* LEFT PANEL: My Jobs List                   */}
-      {/* ========================================== */}
       {/* HIDDEN on mobile/tablet IF a job is selected. Always visible on desktop (xl:flex) */}
-      <div className={`${selectedJob ? 'hidden xl:flex' : 'flex'} flex-col xl:flex-[3] bg-bg-base border border-border-muted rounded-xl shadow-sm overflow-hidden h-full`}>
+      <div className={`${selectedJob ? 'hidden xl:flex' : 'flex'} flex-col xl:flex-3 bg-bg-base border border-border-muted rounded-xl shadow-sm overflow-hidden h-full`}>
         
         <div className="p-4 xl:p-6 border-b border-border-muted flex justify-between items-center">
           <h2 className="text-lg xl:text-xl font-bold text-fg">My Assigned Jobs</h2>
@@ -149,8 +146,7 @@ export default function TechnicianJobs() {
       </div>
 
       {/* RIGHT PANEL: Execution Details             */}
-      {/* HIDDEN on mobile/tablet IF NO job is selected. Always visible on desktop (xl:flex) */}
-      <div className={`${!selectedJob ? 'hidden xl:flex' : 'flex'} flex-col xl:flex-[2] bg-bg-base border border-border-muted rounded-xl shadow-sm overflow-hidden h-full`}>
+      <div className={`${!selectedJob ? 'hidden xl:flex' : 'flex'} flex-col xl:flex-2 bg-bg-base border border-border-muted rounded-xl shadow-sm overflow-hidden h-full`}>
         
         {!selectedJob ? (
           // Empty State (Only visible on Desktop)

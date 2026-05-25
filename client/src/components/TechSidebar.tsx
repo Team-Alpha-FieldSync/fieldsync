@@ -5,16 +5,15 @@ import {
   Settings,
   HelpCircle,
   Search,
-  ChevronDown
+  ChevronDown,
 } from "lucide-react";
-import Button from "./ui/Button"; 
+import Button from "./ui/Button";
 import { Link } from "react-router";
 import LogoutButton from "./LogoutButton";
 
 export default function TechSidebar() {
   return (
     <aside className="w-64 min-h-screen flex flex-col bg-bg-dark text-fg font-sans border-r border-border-muted">
-      
       {/* Logo Section */}
       <div className="flex items-center gap-3 p-6 pb-6">
         <div className="w-8 h-8 bg-bg-light border border-border-muted rounded-full shrink-0"></div>
@@ -23,9 +22,9 @@ export default function TechSidebar() {
 
       {/* Technician Profile Section */}
       <div className="flex flex-col items-center px-6 mb-8 text-center">
-        <img 
-          src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?fit=crop&w=150&h=150" 
-          alt="Technician" 
+        <img
+          src="https://images.unsplash.com/photo-1657356217673-4f7000f768b4?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+          alt="Technician"
           className="w-30 h-30 rounded-full object-cover border-2 border-primary mb-3 shadow-sm"
         />
         <h2 className="text-base font-bold text-fg">Marcus Johnson</h2>
@@ -38,10 +37,26 @@ export default function TechSidebar() {
           Menu
         </h2>
         <nav className="space-y-4">
-          <NavItem icon={<LayoutDashboard size={20} />} label="Dashboard" to="/technician" />
-          <NavItem icon={<Briefcase size={20} />} label="Jobs" to="/technician/jobs" />
-          <NavItem icon={<Settings size={20} />} label="Setting" to="/technician" />
-          <NavItem icon={<HelpCircle size={20} />} label="Help" to="/technician" />
+          <NavItem
+            icon={<LayoutDashboard size={20} />}
+            label="Dashboard"
+            to="/technician"
+          />
+          <NavItem
+            icon={<Briefcase size={20} />}
+            label="Jobs"
+            to="/technician/jobs"
+          />
+          <NavItem
+            icon={<Settings size={20} />}
+            label="Setting"
+            to="/technician"
+          />
+          <NavItem
+            icon={<HelpCircle size={20} />}
+            label="Help"
+            to="/technician"
+          />
         </nav>
       </div>
 
@@ -59,7 +74,10 @@ export default function TechSidebar() {
           <div className="space-y-1.5">
             <label className="text-sm font-medium text-fg">Search</label>
             <div className="relative">
-              <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-primary" />
+              <Search
+                size={16}
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-primary"
+              />
               <input
                 type="text"
                 placeholder="Search jobs..."
@@ -74,22 +92,33 @@ export default function TechSidebar() {
           <FilterSelect label="Priority" placeholder="All Priorities" />
         </div>
       </div>
-      
-      {/* Apply Filters Button using your Component Library */}
-      <div className="p-6">
+
+      {/* Apply Filters Button  */}
+      <div className="p-6 pt-4 mt-auto space-y-4">
         <Button variant="primary" className="w-full">
           Apply Filters
         </Button>
+        
+        <LogoutButton />
+
       </div>
+
       
-      <LogoutButton/>
     </aside>
   );
 }
 
 // --- Helper Components ---
 
-function NavItem({ icon, label, to }: { icon: React.ReactNode; label: string; to: string }) {
+function NavItem({
+  icon,
+  label,
+  to,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  to: string;
+}) {
   return (
     <Link
       to={to}
@@ -103,7 +132,13 @@ function NavItem({ icon, label, to }: { icon: React.ReactNode; label: string; to
   );
 }
 
-function FilterSelect({ label, placeholder }: { label: string; placeholder: string }) {
+function FilterSelect({
+  label,
+  placeholder,
+}: {
+  label: string;
+  placeholder: string;
+}) {
   return (
     <div className="space-y-1.5">
       <label className="text-sm font-medium text-fg">{label}</label>
@@ -111,7 +146,10 @@ function FilterSelect({ label, placeholder }: { label: string; placeholder: stri
         <select className="w-full bg-bg-base border border-border text-sm text-fg rounded-md py-2.5 pl-3 pr-10 appearance-none focus:outline-none focus:ring-1 focus:ring-primary transition-colors cursor-pointer">
           <option value="">{placeholder}</option>
         </select>
-        <ChevronDown size={16} className="absolute right-3 top-1/2 -translate-y-1/2 text-primary pointer-events-none" />
+        <ChevronDown
+          size={16}
+          className="absolute right-3 top-1/2 -translate-y-1/2 text-primary pointer-events-none"
+        />
       </div>
     </div>
   );

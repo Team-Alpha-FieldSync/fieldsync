@@ -52,11 +52,9 @@ export default function Technicians() {
     // Switched to flex-col for mobile, xl:flex-row for desktop. Shrunk padding for mobile.
     <div className="flex flex-col xl:flex-row gap-4 xl:gap-6 h-full p-4 xl:p-6">
       
-      {/* ========================================== */}
       {/* LEFT PANEL: All Technicians List           */}
-      {/* ========================================== */}
       {/* Hidden on mobile if a tech is selected. Visible on desktop always. */}
-      <div className={`${selectedTech ? 'hidden xl:flex' : 'flex'} flex-col xl:flex-[2] bg-bg-base border border-border-muted rounded-xl shadow-sm overflow-hidden h-full`}>
+      <div className={`${selectedTech ? 'hidden xl:flex' : 'flex'} flex-col xl:flex-2 bg-bg-base border border-border-muted rounded-xl shadow-sm overflow-hidden h-full`}>
         <div className="p-4 xl:p-6 border-b border-border-muted">
           <h2 className="text-lg xl:text-xl font-bold text-fg">
             All Technicians ({mockTechnicians.length})
@@ -138,7 +136,7 @@ export default function Technicians() {
           ))}
         </div>
       </div>
-      
+
       {/* RIGHT PANEL: Technician Details            */}
       {/* Hidden on mobile if NO tech is selected. Visible on desktop always. */}
       <div className={`${!selectedTech ? 'hidden xl:flex' : 'flex'} flex-col xl:flex-1 bg-bg-base border border-border-muted rounded-xl shadow-sm overflow-hidden h-full`}>

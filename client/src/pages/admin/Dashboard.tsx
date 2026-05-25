@@ -16,8 +16,7 @@ import StatusBadge from "../../components/StatusBadge";
 const summaryStats = [
   {
     title: "Total Jobs",
-    count: "230",
-    trend: "12.5%",
+    count: "0",
     isPositive: true,
     icon: Briefcase,
     color: "text-blue-500",
@@ -25,8 +24,7 @@ const summaryStats = [
   },
   {
     title: "Active Technicians",
-    count: "110",
-    trend: "8.3%",
+    count: "0",
     isPositive: true,
     icon: Users,
     color: "text-purple-500",
@@ -34,8 +32,7 @@ const summaryStats = [
   },
   {
     title: "Pending Jobs",
-    count: "80",
-    trend: "15.7%",
+    count: "0",
     isPositive: false,
     icon: Clock,
     color: "text-orange-500",
@@ -43,8 +40,7 @@ const summaryStats = [
   },
   {
     title: "Completed Jobs",
-    count: "150",
-    trend: "18.2%",
+    count: "0",
     isPositive: true,
     icon: CheckCircle,
     color: "text-green-500",
@@ -114,7 +110,6 @@ export default function Dashboard() {
                   stat.isPositive ? "text-blue-500" : "text-orange-500"
                 }
               >
-                {stat.trend}
               </span>{" "}
               vs last week
             </p>

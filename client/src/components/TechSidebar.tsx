@@ -2,8 +2,6 @@ import React from "react";
 import {
   LayoutDashboard,
   Briefcase,
-  Settings,
-  HelpCircle,
   Search,
   ChevronDown,
 } from "lucide-react";
@@ -46,16 +44,6 @@ export default function TechSidebar() {
             icon={<Briefcase size={20} />}
             label="Jobs"
             to="/technician/jobs"
-          />
-          <NavItem
-            icon={<Settings size={20} />}
-            label="Setting"
-            to="/technician"
-          />
-          <NavItem
-            icon={<HelpCircle size={20} />}
-            label="Help"
-            to="/technician"
           />
         </nav>
       </div>

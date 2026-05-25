@@ -3,14 +3,12 @@ import {
   LayoutDashboard,
   Briefcase,
   Users,
-  Settings,
-  HelpCircle,
   Search,
   ChevronDown,
-  X 
+  X,
 } from "lucide-react";
-import Button from "./ui/Button"; 
-import { Link } from "react-router"; 
+import Button from "./ui/Button";
+import { Link } from "react-router";
 import LogoutButton from "./LogoutButton";
 
 interface SidebarProps {
@@ -20,10 +18,9 @@ interface SidebarProps {
 export default function Sidebar({ onClose }: SidebarProps) {
   return (
     <aside className="w-full xl:w-64 h-full flex flex-col bg-bg-dark text-fg font-sans border-r border-border-muted overflow-y-auto shadow-xl xl:shadow-none relative">
-      
       {/* Mobile Close Button (Only renders if onClose is provided) */}
       {onClose && (
-        <button 
+        <button
           onClick={onClose}
           className="absolute top-4 right-4 p-2 text-fg-muted hover:text-fg xl:hidden bg-bg-base/10 rounded-full"
         >
@@ -43,12 +40,28 @@ export default function Sidebar({ onClose }: SidebarProps) {
           Menu
         </h2>
         <nav className="space-y-4">
-           {/*  onClick={onClose} to automatically close the menu on mobile after navigation */}
-          <div onClick={onClose}><NavItem icon={<LayoutDashboard size={20} />} label="Dashboard" to="/admin" /></div>
-          <div onClick={onClose}><NavItem icon={<Briefcase size={20} />} label="Jobs" to="/admin/jobs" /></div>
-          <div onClick={onClose}><NavItem icon={<Users size={20} />} label="Technicians" to="/admin/technicians" /></div>
-          <div onClick={onClose}><NavItem icon={<Settings size={20} />} label="Setting" to="/admin" /></div>
-          <div onClick={onClose}><NavItem icon={<HelpCircle size={20} />} label="Help" to="/admin" /></div>
+          {/*  onClick={onClose} to automatically close the menu on mobile after navigation */}
+          <div onClick={onClose}>
+            <NavItem
+              icon={<LayoutDashboard size={20} />}
+              label="Dashboard"
+              to="/admin"
+            />
+          </div>
+          <div onClick={onClose}>
+            <NavItem
+              icon={<Briefcase size={20} />}
+              label="Jobs"
+              to="/admin/jobs"
+            />
+          </div>
+          <div onClick={onClose}>
+            <NavItem
+              icon={<Users size={20} />}
+              label="Technicians"
+              to="/admin/technicians"
+            />
+          </div>
         </nav>
       </div>
 
@@ -66,7 +79,10 @@ export default function Sidebar({ onClose }: SidebarProps) {
           <div className="space-y-1.5">
             <label className="text-sm font-medium text-fg">Search</label>
             <div className="relative">
-              <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-primary" />
+              <Search
+                size={16}
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-primary"
+              />
               <input
                 type="text"
                 placeholder="Search jobs..."
@@ -82,24 +98,29 @@ export default function Sidebar({ onClose }: SidebarProps) {
         </div>
       </div>
 
-
       {/* Apply Filters Button */}
       <div className="p-6 pt-0 mt-auto space-y-4">
         <Button variant="primary" className="w-full">
           Apply Filters
         </Button>
 
-        <LogoutButton/>
+        <LogoutButton />
       </div>
-      
-     
     </aside>
   );
 }
 
 // --- Helper Components ---
 
-function NavItem({ icon, label, to }: { icon: React.ReactNode; label: string; to: string }) {
+function NavItem({
+  icon,
+  label,
+  to,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  to: string;
+}) {
   return (
     <Link
       to={to}
@@ -113,7 +134,13 @@ function NavItem({ icon, label, to }: { icon: React.ReactNode; label: string; to
   );
 }
 
-function FilterSelect({ label, placeholder }: { label: string; placeholder: string }) {
+function FilterSelect({
+  label,
+  placeholder,
+}: {
+  label: string;
+  placeholder: string;
+}) {
   return (
     <div className="space-y-1.5">
       <label className="text-sm font-medium text-fg">{label}</label>
@@ -121,7 +148,10 @@ function FilterSelect({ label, placeholder }: { label: string; placeholder: stri
         <select className="w-full bg-bg-base border border-border text-sm text-fg rounded-md py-2.5 pl-3 pr-10 appearance-none focus:outline-none focus:ring-1 focus:ring-primary transition-colors cursor-pointer">
           <option value="">{placeholder}</option>
         </select>
-        <ChevronDown size={16} className="absolute right-3 top-1/2 -translate-y-1/2 text-primary pointer-events-none" />
+        <ChevronDown
+          size={16}
+          className="absolute right-3 top-1/2 -translate-y-1/2 text-primary pointer-events-none"
+        />
       </div>
     </div>
   );

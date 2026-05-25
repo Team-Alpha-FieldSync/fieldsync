@@ -16,11 +16,11 @@ export default function Button({
   ...props
 }: ButtonProps) {
   
-  // Notice we now use focus-visible:ring-highlight
+  
   const baseStyles =
     "inline-flex items-center justify-center rounded-md font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-highlight disabled:pointer-events-none disabled:opacity-50 hover:brightness-110 active:brightness-90";
 
-  // Using your custom OKLCH colors!
+
   const variants = {
     primary: "bg-primary text-bg-dark",
     secondary: "bg-secondary text-bg-dark",

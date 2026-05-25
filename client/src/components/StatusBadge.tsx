@@ -13,7 +13,6 @@ export default function StatusBadge({
   ...props 
 }: StatusBadgeProps) {
   
-  // 2. Dictionary Pattern mapping statuses to your specific OKLCH colors
   const variants = {
     "success": "bg-success text-bg-light",
     "pending": "bg-warning text-fg",

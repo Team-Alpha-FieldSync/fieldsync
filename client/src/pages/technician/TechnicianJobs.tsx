@@ -148,9 +148,7 @@ export default function TechnicianJobs() {
         </div>
       </div>
 
-      {/* ========================================== */}
       {/* RIGHT PANEL: Execution Details             */}
-      {/* ========================================== */}
       {/* HIDDEN on mobile/tablet IF NO job is selected. Always visible on desktop (xl:flex) */}
       <div className={`${!selectedJob ? 'hidden xl:flex' : 'flex'} flex-col xl:flex-[2] bg-bg-base border border-border-muted rounded-xl shadow-sm overflow-hidden h-full`}>
         

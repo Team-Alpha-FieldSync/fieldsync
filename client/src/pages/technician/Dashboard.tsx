@@ -26,12 +26,9 @@ const myJobs = [
 
 export default function TechnicianDashboard() {
   return (
-    // Shrunk padding on mobile (p-4) vs desktop (xl:p-6)
     <div className="space-y-4 xl:space-y-6 p-4 xl:p-6">
       
-      {/* ========================================== */}
       {/* TOP ROW: 4 Summary Cards                   */}
-      {/* ========================================== */}
       {/* Mobile: 1 col, Tablet: 2 cols, Desktop: 4 cols */}
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 xl:gap-6">
         {summaryStats.map((stat, index) => (
@@ -52,13 +49,10 @@ export default function TechnicianDashboard() {
         ))}
       </div>
 
-      {/* ========================================== */}
       {/* MIDDLE ROW: Schedule & Current Job Widget  */}
-      {/* ========================================== */}
       <div className="flex flex-col xl:grid xl:grid-cols-3 gap-4 xl:gap-6">
         
         {/* Right Widget: Current Job */}
-        {/* MOBILE: order-1 puts it on top. DESKTOP: order-2 puts it on the right */}
         <div className="order-1 xl:order-2 xl:col-span-1 bg-bg-base border border-border-muted rounded-xl shadow-sm p-4 xl:p-6 flex flex-col">
           <div className="flex items-center justify-between mb-4 xl:mb-6">
             <h2 className="text-lg xl:text-xl font-bold text-fg">Current Job</h2>

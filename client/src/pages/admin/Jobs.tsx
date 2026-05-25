@@ -75,11 +75,10 @@ export default function Jobs() {
     // Shrunk padding on mobile
     <div className="flex flex-col xl:flex-row gap-4 xl:gap-6 h-full p-4 xl:p-6">
       
-      {/* ========================================== */}
+ 
       {/* LEFT PANEL: All Jobs List                  */}
-      {/* ========================================== */}
       {/* Hidden on mobile if a job is selected. Visible on desktop always. */}
-      <div className={`${selectedJob ? 'hidden xl:flex' : 'flex'} flex-col xl:flex-[2] bg-bg-base border border-border-muted rounded-xl shadow-sm overflow-hidden h-full`}>
+      <div className={`${selectedJob ? 'hidden xl:flex' : 'flex'} flex-col xl:flex-2 bg-bg-base border border-border-muted rounded-xl shadow-sm overflow-hidden h-full`}>
         <div className="p-4 xl:p-6 border-b border-border-muted flex justify-between items-center">
           <h2 className="text-lg xl:text-xl font-bold text-fg">All Jobs ({mockJobs.length})</h2>
         </div>
@@ -165,9 +164,7 @@ export default function Jobs() {
         </div>
       </div>
 
-      {/* ========================================== */}
       {/* RIGHT PANEL: Job Details                   */}
-      {/* ========================================== */}
       {/* Hidden on mobile if NO job is selected. Visible on desktop always. */}
       <div className={`${!selectedJob ? 'hidden xl:flex' : 'flex'} flex-col xl:flex-1 bg-bg-base border border-border-muted rounded-xl shadow-sm overflow-hidden h-full`}>
         
@@ -233,13 +230,13 @@ export default function Jobs() {
               {/* Assignment Boxes */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {/* Client Box */}
-                <div className="bg-bg-light border border-border-muted p-4 rounded-lg flex flex-col items-center justify-center text-center sm:min-h-[100px]">
+                <div className="bg-bg-light border border-border-muted p-4 rounded-lg flex flex-col items-center justify-center text-center sm:min-h-25">
                   <p className="text-xs text-fg-muted mb-1">Client</p>
                   <p className="text-sm font-bold text-fg">{selectedJob.client.name}</p>
                 </div>
                 
                 {/* Technician Box */}
-                <div className="bg-bg-light border border-border-muted p-4 rounded-lg flex flex-col items-center justify-center text-center sm:min-h-[100px] hover:border-primary transition-colors cursor-pointer group">
+                <div className="bg-bg-light border border-border-muted p-4 rounded-lg flex flex-col items-center justify-center text-center sm:min-h-25 hover:border-primary transition-colors cursor-pointer group">
                   {selectedJob.assignedTech ? (
                     <>
                       <p className="text-xs text-fg-muted mb-1">Technician</p>

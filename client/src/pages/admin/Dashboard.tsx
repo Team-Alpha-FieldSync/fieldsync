@@ -33,7 +33,6 @@ const techActivity = [
 
 export default function Dashboard() {
   return (
-    // Adjusted outer padding and spacing for mobile
     <div className="space-y-4 xl:space-y-6 p-4 xl:p-6">
       
 
@@ -60,9 +59,7 @@ export default function Dashboard() {
         ))}
       </div>
 
-      {/* ========================================== */}
       {/* MIDDLE ROW: Recent Jobs & Tech Activity    */}
-      {/* ========================================== */}
       <div className="flex flex-col xl:grid xl:grid-cols-3 gap-4 xl:gap-6">
         
         {/* Left Widget: Recent Jobs */}
@@ -197,9 +194,7 @@ export default function Dashboard() {
 
       </div>
 
-      {/* ========================================== */}
       {/* BOTTOM ROW: Charts & Quick Actions         */}
-      {/* ========================================== */}
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 xl:gap-6">
         
         {/* Jobs Completed Chart Placeholder */}

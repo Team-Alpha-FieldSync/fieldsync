@@ -19,7 +19,6 @@ interface SidebarProps {
 
 export default function Sidebar({ onClose }: SidebarProps) {
   return (
-    // Updated classes: w-full on mobile, xl:w-64 on desktop, added overflow-y-auto and relative positioning
     <aside className="w-full xl:w-64 h-full flex flex-col bg-bg-dark text-fg font-sans border-r border-border-muted overflow-y-auto shadow-xl xl:shadow-none relative">
       
       {/* Mobile Close Button (Only renders if onClose is provided) */}

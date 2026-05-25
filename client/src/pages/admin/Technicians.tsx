@@ -138,10 +138,8 @@ export default function Technicians() {
           ))}
         </div>
       </div>
-
-      {/* ========================================== */}
+      
       {/* RIGHT PANEL: Technician Details            */}
-      {/* ========================================== */}
       {/* Hidden on mobile if NO tech is selected. Visible on desktop always. */}
       <div className={`${!selectedTech ? 'hidden xl:flex' : 'flex'} flex-col xl:flex-1 bg-bg-base border border-border-muted rounded-xl shadow-sm overflow-hidden h-full`}>
         

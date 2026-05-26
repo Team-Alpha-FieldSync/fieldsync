@@ -2,7 +2,6 @@ import React from "react";
 import {
   LayoutDashboard,
   Briefcase,
-  Users,
   Search,
   ChevronDown,
   X,
@@ -11,27 +10,36 @@ import Button from "./ui/Button";
 import { NavLink } from "react-router-dom";
 import LogoutButton from "./LogoutButton";
 
-interface SidebarProps {
+interface TechSidebarProps {
   onClose?: () => void;
 }
 
-export default function Sidebar({ onClose }: SidebarProps) {
+export default function TechSidebar({ onClose }: TechSidebarProps) {
   return (
-    <aside className="w-full xl:w-64 h-full flex flex-col bg-bg-dark text-fg font-sans border-r border-border-muted overflow-y-auto shadow-xl xl:shadow-none relative">
-      {/* Mobile Close Button (Only renders if onClose is provided) */}
+    <aside className="w-full md:w-64 h-full flex flex-col bg-bg-dark text-fg font-sans border-r border-border-muted overflow-y-auto shadow-xl md:shadow-none relative">
       {onClose && (
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 p-2 text-fg-muted hover:text-fg xl:hidden bg-bg-base/10 rounded-full"
+          className="absolute top-4 right-4 p-2 text-fg-muted hover:text-fg md:hidden bg-bg-base/10 rounded-full"
         >
           <X size={20} />
         </button>
       )}
-
       {/* Logo Section */}
-      <div className="flex items-center gap-3 p-6 pb-8">
+      <div className="flex items-center gap-3 p-6 pb-6">
         <div className="w-8 h-8 bg-bg-light border border-border-muted rounded-full shrink-0"></div>
         <h1 className="text-xl font-bold tracking-wide">FieldSync</h1>
+      </div>
+
+      {/* Technician Profile Section */}
+      <div className="flex flex-col items-center px-6 mb-8 text-center">
+        <img
+          src="https://images.unsplash.com/photo-1657356217673-4f7000f768b4?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+          alt="Technician"
+          className="w-30 h-30 rounded-full object-cover border-2 border-primary mb-3 shadow-sm"
+        />
+        <h2 className="text-base font-bold text-fg">Marcus Johnson</h2>
+        <p className="text-xs font-medium text-fg-muted">Senior Technician</p>
       </div>
 
       {/* Main Menu */}
@@ -40,12 +48,11 @@ export default function Sidebar({ onClose }: SidebarProps) {
           Menu
         </h2>
         <nav className="space-y-4">
-          {/*  onClick={onClose} to automatically close the menu on mobile after navigation */}
           <div onClick={onClose}>
             <NavItem
               icon={<LayoutDashboard size={20} />}
               label="Dashboard"
-              to="/admin"
+              to="/technician"
               end
             />
           </div>
@@ -53,14 +60,7 @@ export default function Sidebar({ onClose }: SidebarProps) {
             <NavItem
               icon={<Briefcase size={20} />}
               label="Jobs"
-              to="/admin/jobs"
-            />
-          </div>
-          <div onClick={onClose}>
-            <NavItem
-              icon={<Users size={20} />}
-              label="Technicians"
-              to="/admin/technicians"
+              to="/technician/jobs"
             />
           </div>
         </nav>
@@ -70,7 +70,7 @@ export default function Sidebar({ onClose }: SidebarProps) {
       <div className="mt-8 mb-6 border-t border-border-muted mx-6"></div>
 
       {/* Technician Filters */}
-      <div className="px-6 flex-1 pb-4">
+      <div className="px-6 flex-1">
         <h2 className="text-[10px] font-bold text-fg-muted uppercase tracking-wider mb-4">
           Technician Filters
         </h2>
@@ -99,14 +99,17 @@ export default function Sidebar({ onClose }: SidebarProps) {
         </div>
       </div>
 
-      {/* Apply Filters Button */}
-      <div className="p-6 pt-0 mt-auto space-y-4">
+      {/* Apply Filters Button  */}
+      <div className="p-6 pt-4 mt-auto space-y-4">
         <Button variant="primary" className="w-full">
           Apply Filters
         </Button>
-
+        
         <LogoutButton />
+
       </div>
+
+      
     </aside>
   );
 }

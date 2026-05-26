@@ -26,7 +26,7 @@ export default {
             const isValid = await comparePassword(password, user.password);
 
             if (!isValid){
-                throw new GraphQLError('INvalid credentials', {
+                throw new GraphQLError('Invalid credentials', {
                     extensions: {code: 'UNAUTHENTICATED'},
                 });
             }

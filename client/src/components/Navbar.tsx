@@ -1,11 +1,15 @@
-import { useState } from "react"; 
-import { useLocation } from "react-router-dom";
-import { Bell, User, Menu } from "lucide-react";
-import Button from "./ui/Button"; 
+import { useState } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Bell, User, Menu, LogOut } from "lucide-react";
+import Button from "./ui/Button";
 import AddJobModal from "./AddJobModal";
 import NotificationsModal from "./NotificationsModel";
+import useAuth from "../hooks/useAuth";
+
 export default function AdminNavbar({ onMenuClick }: { onMenuClick?: () => void }) {
   const location = useLocation();
+  const navigate = useNavigate();
+  const { user, logout } = useAuth();
   
   // 3. State to control the modals
   const [isAddJobModalOpen, setIsAddJobModalOpen] = useState(false);
@@ -29,22 +33,35 @@ export default function AdminNavbar({ onMenuClick }: { onMenuClick?: () => void 
     if (currentConfig.actionText === "+ Add Job") {
       setIsAddJobModalOpen(true);
     }
-    // You can add 'else if' here later for "+ Add Technician"
   };
+
+  const handleLogout = () => {
+    logout();
+    navigate("/login");
+  };
+
+  const roleLabel = user?.role === "ADMIN" ? "Admin" : user?.role ?? "User";
 
   return (
     <>
       <header className="h-16 px-4 xl:px-8 bg-bg-base border-b border-border-muted flex items-center justify-between sticky top-0 z-30">
         
-        {/* Left Side: Mobile Menu & Dynamic Title */}
-        <div className="flex items-center gap-3">
-          <button 
+        {/* Left Side: Branding, Mobile Menu & Dynamic Title */}
+        <div className="flex items-center gap-3 min-w-0">
+          <Link
+            to="/admin"
+            className="hidden sm:flex items-center gap-2 shrink-0 mr-1"
+          >
+            <div className="w-7 h-7 bg-bg-light border border-border-muted rounded-full shrink-0" />
+            <span className="font-bold text-fg hidden lg:inline">FieldSync</span>
+          </Link>
+          <button
             onClick={onMenuClick}
             className="xl:hidden p-2 -ml-2 text-fg-muted hover:text-fg transition-colors"
           >
             <Menu size={24} />
           </button>
-          <div>
+          <div className="min-w-0">
             <h1 className="text-xl xl:text-2xl font-bold text-fg tracking-tight">
               {currentConfig.title}
             </h1>
@@ -80,14 +97,22 @@ export default function AdminNavbar({ onMenuClick }: { onMenuClick?: () => void 
             <span className="absolute top-0 right-0 w-2.5 h-2.5 bg-danger rounded-full border-2 border-bg-base"></span>
           </button>
 
-          <div className="flex items-center gap-3 pl-1 xl:pl-2">
+          <div className="flex items-center gap-2 xl:gap-3 pl-1 xl:pl-2">
             <div className="w-8 h-8 xl:w-10 xl:h-10 bg-primary/20 text-primary rounded-full flex items-center justify-center border border-primary/30 shrink-0">
               <User size={18} className="xl:w-5 xl:h-5" />
             </div>
             <div className="hidden xl:block">
-              <p className="text-sm font-bold text-fg leading-tight">Admin</p>
-              <p className="text-xs text-fg-muted">admin@fieldsync.com</p>
+              <p className="text-sm font-bold text-fg leading-tight">{roleLabel}</p>
+              <p className="text-xs text-fg-muted">{user?.email ?? "admin@fieldsync.com"}</p>
             </div>
+            <button
+              type="button"
+              onClick={handleLogout}
+              title="Logout"
+              className="text-fg-muted hover:text-danger transition-colors bg-bg-light p-2 rounded-full border border-border-muted"
+            >
+              <LogOut size={18} />
+            </button>
           </div>
         </div>
       </header>

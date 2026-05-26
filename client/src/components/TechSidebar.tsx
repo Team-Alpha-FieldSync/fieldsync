@@ -4,14 +4,27 @@ import {
   Briefcase,
   Search,
   ChevronDown,
+  X,
 } from "lucide-react";
 import Button from "./ui/Button";
-import { Link } from "react-router";
+import { NavLink } from "react-router-dom";
 import LogoutButton from "./LogoutButton";
 
-export default function TechSidebar() {
+interface TechSidebarProps {
+  onClose?: () => void;
+}
+
+export default function TechSidebar({ onClose }: TechSidebarProps) {
   return (
-    <aside className="w-64 min-h-screen flex flex-col bg-bg-dark text-fg font-sans border-r border-border-muted">
+    <aside className="w-full md:w-64 h-full flex flex-col bg-bg-dark text-fg font-sans border-r border-border-muted overflow-y-auto shadow-xl md:shadow-none relative">
+      {onClose && (
+        <button
+          onClick={onClose}
+          className="absolute top-4 right-4 p-2 text-fg-muted hover:text-fg md:hidden bg-bg-base/10 rounded-full"
+        >
+          <X size={20} />
+        </button>
+      )}
       {/* Logo Section */}
       <div className="flex items-center gap-3 p-6 pb-6">
         <div className="w-8 h-8 bg-bg-light border border-border-muted rounded-full shrink-0"></div>
@@ -35,16 +48,21 @@ export default function TechSidebar() {
           Menu
         </h2>
         <nav className="space-y-4">
-          <NavItem
-            icon={<LayoutDashboard size={20} />}
-            label="Dashboard"
-            to="/technician"
-          />
-          <NavItem
-            icon={<Briefcase size={20} />}
-            label="Jobs"
-            to="/technician/jobs"
-          />
+          <div onClick={onClose}>
+            <NavItem
+              icon={<LayoutDashboard size={20} />}
+              label="Dashboard"
+              to="/technician"
+              end
+            />
+          </div>
+          <div onClick={onClose}>
+            <NavItem
+              icon={<Briefcase size={20} />}
+              label="Jobs"
+              to="/technician/jobs"
+            />
+          </div>
         </nav>
       </div>
 
@@ -102,21 +120,40 @@ function NavItem({
   icon,
   label,
   to,
+  end = false,
 }: {
   icon: React.ReactNode;
   label: string;
   to: string;
+  end?: boolean;
 }) {
   return (
-    <Link
+    <NavLink
       to={to}
-      className="flex items-center gap-3 text-fg-muted hover:text-fg transition-colors group"
+      end={end}
+      className={({ isActive }) =>
+        `flex items-center gap-3 transition-colors group rounded-lg px-3 py-2 -mx-3 ${
+          isActive
+            ? "text-fg bg-primary/10 border border-primary/20"
+            : "text-fg-muted hover:text-fg"
+        }`
+      }
     >
-      <span className="text-fg-muted group-hover:text-primary transition-colors">
-        {icon}
-      </span>
-      <span className="font-medium text-sm">{label}</span>
-    </Link>
+      {({ isActive }) => (
+        <>
+          <span
+            className={`transition-colors ${
+              isActive
+                ? "text-primary"
+                : "text-fg-muted group-hover:text-primary"
+            }`}
+          >
+            {icon}
+          </span>
+          <span className="font-medium text-sm">{label}</span>
+        </>
+      )}
+    </NavLink>
   );
 }
 

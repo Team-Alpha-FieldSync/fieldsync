@@ -8,7 +8,7 @@ import {
   X,
 } from "lucide-react";
 import Button from "./ui/Button";
-import { Link } from "react-router";
+import { NavLink } from "react-router-dom";
 import LogoutButton from "./LogoutButton";
 
 interface SidebarProps {
@@ -46,6 +46,7 @@ export default function Sidebar({ onClose }: SidebarProps) {
               icon={<LayoutDashboard size={20} />}
               label="Dashboard"
               to="/admin"
+              end
             />
           </div>
           <div onClick={onClose}>
@@ -116,21 +117,40 @@ function NavItem({
   icon,
   label,
   to,
+  end = false,
 }: {
   icon: React.ReactNode;
   label: string;
   to: string;
+  end?: boolean;
 }) {
   return (
-    <Link
+    <NavLink
       to={to}
-      className="flex items-center gap-3 text-fg-muted hover:text-fg transition-colors group"
+      end={end}
+      className={({ isActive }) =>
+        `flex items-center gap-3 transition-colors group rounded-lg px-3 py-2 -mx-3 ${
+          isActive
+            ? "text-fg bg-primary/10 border border-primary/20"
+            : "text-fg-muted hover:text-fg"
+        }`
+      }
     >
-      <span className="text-fg-muted group-hover:text-primary transition-colors">
-        {icon}
-      </span>
-      <span className="font-medium text-sm">{label}</span>
-    </Link>
+      {({ isActive }) => (
+        <>
+          <span
+            className={`transition-colors ${
+              isActive
+                ? "text-primary"
+                : "text-fg-muted group-hover:text-primary"
+            }`}
+          >
+            {icon}
+          </span>
+          <span className="font-medium text-sm">{label}</span>
+        </>
+      )}
+    </NavLink>
   );
 }
 

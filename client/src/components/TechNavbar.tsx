@@ -1,7 +1,8 @@
 import { useState } from "react";
-import { useLocation } from "react-router-dom";
-import { Bell, User, Menu } from "lucide-react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Bell, User, Menu, LogOut } from "lucide-react";
 import NotificationsModal from "./NotificationsModel";
+import useAuth from "../hooks/useAuth";
 
 export default function TechNavbar({
   onMenuClick,
@@ -9,6 +10,8 @@ export default function TechNavbar({
   onMenuClick?: () => void;
 }) {
   const location = useLocation();
+  const navigate = useNavigate();
+  const { user, logout } = useAuth();
 
   // 1. Add state for the Notifications Modal
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
@@ -35,11 +38,26 @@ export default function TechNavbar({
     actionText: null,
   };
 
+  const handleLogout = () => {
+    logout();
+    navigate("/login");
+  };
+
+  const roleLabel =
+    user?.role === "TECHNICIAN" ? "Technician" : user?.role ?? "User";
+
   return (
     <>
       <header className="h-16 px-4 md:px-8 bg-bg-base border-b border-border-muted flex items-center justify-between sticky top-0 z-30">
-        {/* Left Side: Mobile Menu & Dynamic Title */}
-        <div className="flex items-center gap-3">
+        {/* Left Side: Branding, Mobile Menu & Dynamic Title */}
+        <div className="flex items-center gap-3 min-w-0">
+          <Link
+            to="/technician"
+            className="hidden sm:flex items-center gap-2 shrink-0 mr-1"
+          >
+            <div className="w-7 h-7 bg-bg-light border border-border-muted rounded-full shrink-0" />
+            <span className="font-bold text-fg hidden lg:inline">FieldSync</span>
+          </Link>
           <button
             onClick={onMenuClick}
             className="md:hidden p-2 -ml-2 text-fg-muted hover:text-fg transition-colors"
@@ -47,7 +65,7 @@ export default function TechNavbar({
             <Menu size={24} />
           </button>
 
-          <div>
+          <div className="min-w-0">
             <h1 className="text-xl md:text-2xl font-bold text-fg tracking-tight">
               {currentConfig.title}
             </h1>
@@ -72,17 +90,26 @@ export default function TechNavbar({
             <span className="absolute top-0 right-0 w-2.5 h-2.5 bg-danger rounded-full border-2 border-bg-base"></span>
           </button>
 
-          {/* Profile */}
-          <div className="flex items-center gap-3 pl-1 md:pl-2">
+          <div className="flex items-center gap-2 md:gap-3 pl-1 md:pl-2">
             <div className="w-8 h-8 md:w-10 md:h-10 bg-primary/20 text-primary rounded-full flex items-center justify-center border border-primary/30 shrink-0">
               <User size={18} className="md:w-5 md:h-5" />
             </div>
             <div className="hidden md:block">
               <p className="text-sm font-bold text-fg leading-tight">
-                Marcus Johnson
+                {roleLabel}
               </p>
-              <p className="text-xs text-fg-muted">Senior Technician</p>
+              <p className="text-xs text-fg-muted">
+                {user?.email ?? "technician@fieldsync.com"}
+              </p>
             </div>
+            <button
+              type="button"
+              onClick={handleLogout}
+              title="Logout"
+              className="text-fg-muted hover:text-danger transition-colors bg-bg-light p-2 rounded-full border border-border-muted"
+            >
+              <LogOut size={18} />
+            </button>
           </div>
         </div>
       </header>

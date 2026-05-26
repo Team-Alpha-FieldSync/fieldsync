@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import useLoginRedirect from "../../auth/LoginRedirect";
-import Input from "../../components/Input";
+import Input from "../../components/ui/Input";
 import Button from "../../components/ui/Button";
 
 export default function AuthLayout() {

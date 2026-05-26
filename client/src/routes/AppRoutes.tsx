@@ -1,4 +1,4 @@
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 
 // pages
 import Login from "../pages/auth/Login";
@@ -73,6 +73,7 @@ export default function AppRoutes(){
       </Route>
 
       {/* COMMON */}
+      <Route path="/" element={<Navigate to="/login" replace />} />
       <Route path="/unauthorized" element={<Unauthorized />} />
       <Route path="*" element={<NotFound />} />
      

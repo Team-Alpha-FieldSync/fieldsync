@@ -5,7 +5,7 @@
   /* Fonts */
   --font-sans: system-ui, -apple-system, sans-serif;
   
-  /* Backgrounds: Very subtle mint/slate tints */
+   /* Backgrounds: Very subtle mint/slate tints */
   --color-bg-dark: oklch(0.95 0.01 150);
   --color-bg-base: oklch(0.98 0.005 150); 
   --color-bg-light: oklch(1 0 0);

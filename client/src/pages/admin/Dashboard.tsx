@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import StatusBadge from "../../components/StatusBadge";
+import { formatPriority } from "../../utils/formatters";
 
 // --- Mock Data ---
 const summaryStats = [
@@ -54,17 +55,17 @@ const recentJobs = [
     client: "Acme Corp",
     location: "New York, NY",
     tech: "Michael Smith",
-    status: "pending" as const,
-    priority: "High",
+    status: "PENDING" as const,
+    priority: "HIGH",
     date: "Oct 24, 2023",
   },
   {
     id: "JOB-102",
     client: "Globex",
     location: "Boston, MA",
-    tech: "Unassigned",
-    status: "in-progress" as const,
-    priority: "Medium",
+    tech: "Sarah Connor",
+    status: "IN_PROGRESS" as const,
+    priority: "MEDIUM",
     date: "Oct 23, 2023",
   },
 ];
@@ -163,14 +164,14 @@ export default function Dashboard() {
                     </span>
                     <span
                       className={`text-xs font-bold px-2 py-1 rounded border ${
-                        job.priority === "High"
+                        job.priority === "HIGH"
                           ? "text-danger border-danger/20 bg-danger/5"
-                          : job.priority === "Medium"
+                          : job.priority === "MEDIUM"
                             ? "text-yellow-600 border-yellow-600/20 bg-yellow-600/5"
                             : "text-success border-success/20 bg-success/5"
                       }`}
                     >
-                      {job.priority}
+                      {formatPriority(job.priority)}
                     </span>
                   </div>
                 </div>
@@ -210,7 +211,7 @@ export default function Dashboard() {
                         <td className="p-4">
                           <StatusBadge status={job.status} />
                         </td>
-                        <td className="p-4">{job.priority}</td>
+                        <td className="p-4">{formatPriority(job.priority)}</td>
                         <td className="p-4">{job.date}</td>
                       </tr>
                     ))

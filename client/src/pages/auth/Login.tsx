@@ -4,7 +4,7 @@ import useLoginRedirect from "../../auth/LoginRedirect";
 import Input from "../../components/ui/Input";
 import Button from "../../components/ui/Button";
 
-export default function AuthLayout() {
+export default function Login() {
   const { handleLogin, loading, error } = useLoginRedirect();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");

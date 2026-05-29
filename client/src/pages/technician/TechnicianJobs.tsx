@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import Button from "../../components/ui/Button"; 
 import StatusBadge from "../../components/StatusBadge"; 
+import { formatPriority } from "../../utils/formatters";
 
 // --- Types & Mock Data stay exactly the same ---
 type Job = {
@@ -21,8 +22,8 @@ type Job = {
   description: string;
   category: string;
   client: { name: string; phone: string; address: string; contactPerson: string; };
-  status: "success" | "pending" | "error" | "in-progress";
-  priority: "High" | "Medium" | "Low";
+  status: "PENDING" | "IN_PROGRESS" | "COMPLETED" | "VERIFIED" | "CANCELLED";
+  priority: "HIGH" | "MEDIUM" | "LOW";
   date: string;
   timeWindow: string;
 };
@@ -34,8 +35,8 @@ const myJobs: Job[] = [
     description: "Multiple users are unable to connect to the system. WIFI is down in the entire building and the router shows a red light. Customers complained about frequent connectivity issues in the last week.",
     category: "Networking",
     client: { name: "Robert Shoal", phone: "+1 234 567 8900", address: "123 Tech Park, Bldg 4, NY", contactPerson: "Robert (Site Manager)", },
-    status: "in-progress",
-    priority: "High",
+    status: "IN_PROGRESS",
+    priority: "HIGH",
     date: "Today",
     timeWindow: "08:00 AM - 10:00 AM",
   },
@@ -45,8 +46,8 @@ const myJobs: Job[] = [
     description: "Main server rack in the basement is completely unresponsive. Suspected blown fuse or faulty PDU. Client requested a call 15 mins prior to arrival.",
     category: "Electrical",
     client: { name: "Cyberdyne Systems", phone: "+1 987 654 3210", address: "99 AI Boulevard, NY", contactPerson: "Sarah Connor", },
-    status: "pending",
-    priority: "High",
+    status: "PENDING",
+    priority: "HIGH",
     date: "Today",
     timeWindow: "11:30 AM - 01:30 PM",
   },
@@ -56,8 +57,8 @@ const myJobs: Job[] = [
     description: "Quarterly filter replacement and system diagnostic for the rooftop units. Bring ladder and standard filter replacements.",
     category: "HVAC",
     client: { name: "Acme Corp", phone: "+1 555 123 4567", address: "45 Industrial Way, NJ", contactPerson: "Front Desk", },
-    status: "success",
-    priority: "Low",
+    status: "COMPLETED",
+    priority: "LOW",
     date: "Yesterday",
     timeWindow: "02:00 PM - 04:00 PM",
   },
@@ -76,7 +77,7 @@ export default function TechnicianJobs() {
         <div className="p-4 xl:p-6 border-b border-border-muted flex justify-between items-center">
           <h2 className="text-lg xl:text-xl font-bold text-fg">My Assigned Jobs</h2>
           <span className="bg-primary/10 text-primary text-xs font-bold px-3 py-1 rounded-full">
-            {myJobs.filter((j) => j.status !== "success").length} Active
+            {myJobs.filter((j) => j.status !== "COMPLETED").length} Active
           </span>
         </div>
 
@@ -106,7 +107,7 @@ export default function TechnicianJobs() {
                 <div className="flex justify-between items-start w-full mb-1">
                   <div className="flex items-center gap-2">
                     <span className="text-xs font-bold text-primary">{job.id}</span>
-                    {job.priority === "High" && <AlertCircle size={12} className="text-danger shrink-0" />}
+                    {job.priority === "HIGH" && <AlertCircle size={12} className="text-danger shrink-0" />}
                   </div>
                   {/* Status badge appears here on mobile/tablet, hidden on desktop */}
                   <div className="xl:hidden">
@@ -174,11 +175,11 @@ export default function TechnicianJobs() {
                 <div className="hidden sm:block"><StatusBadge status={selectedJob.status} /></div>
               </div>
               <span className={`text-xs font-bold px-2 py-1 rounded border ${
-                  selectedJob.priority === "High" ? "text-danger border-danger/20 bg-danger/5"
-                    : selectedJob.priority === "Medium" ? "text-yellow-600 border-yellow-600/20 bg-yellow-600/5"
+                  selectedJob.priority === "HIGH" ? "text-danger border-danger/20 bg-danger/5"
+                    : selectedJob.priority === "MEDIUM" ? "text-yellow-600 border-yellow-600/20 bg-yellow-600/5"
                     : "text-success border-success/20 bg-success/5"
                 }`}>
-                {selectedJob.priority} <span className="hidden sm:inline">Priority</span>
+                {formatPriority(selectedJob.priority)} <span className="hidden sm:inline">Priority</span>
               </span>
             </div>
 
@@ -245,17 +246,17 @@ export default function TechnicianJobs() {
 
               {/* Execution Actions */}
               <div className="pt-6 border-t border-border-muted flex flex-col gap-3 pb-8 xl:pb-0">
-                {selectedJob.status === "pending" && (
+                {selectedJob.status === "PENDING" && (
                   <Button variant="primary" className="w-full justify-center py-3 text-base">
                     <Play size={18} className="mr-2 fill-current" /> Start Job
                   </Button>
                 )}
-                {selectedJob.status === "in-progress" && (
+                {selectedJob.status === "IN_PROGRESS" && (
                   <Button variant="primary" className="w-full justify-center py-3 text-base bg-green-600 hover:bg-green-700">
                     <CheckCircle size={18} className="mr-2" /> Mark as Complete
                   </Button>
                 )}
-                {selectedJob.status === "success" && (
+                {selectedJob.status === "COMPLETED" && (
                   <div className="bg-green-50 text-green-700 border border-green-200 p-3 rounded-lg text-sm text-center font-medium flex items-center justify-center gap-2">
                     <CheckCircle size={18} /> Job Completed Successfully
                   </div>

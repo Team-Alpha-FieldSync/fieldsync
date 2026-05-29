@@ -23,6 +23,25 @@ enum NotificationType{
     SYSTEM_ALERT
 }
 
+enum Priority {
+    HIGH
+    MEDIUM
+    LOW
+}
+
+enum Category {
+    NETWORKING
+    ELECTRICAL
+    HVAC
+    PLUMBING
+    OTHER
+}
+
+enum Availability {
+    AVAILABLE
+    UNAVAILABLE
+}
+
 #=== TYPES ===
 
 type User {
@@ -51,7 +70,7 @@ type Job{
 type Notification {
     id: ID!
     user: User!
-    job: Job!
+    job: Job
     type: NotificationType!
     message: String!
     read: Boolean!

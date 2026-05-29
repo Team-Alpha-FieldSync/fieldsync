@@ -42,6 +42,11 @@ enum Availability {
     UNAVAILABLE
 }
 
+enum ReportStatus {
+    PENDING
+    SUBMITTED
+}
+
 #=== TYPES ===
 
 type User {
@@ -92,6 +97,17 @@ type DashboardStats {
     completedJobs: Int!
 }
 
+type Report {
+    id: ID!
+    job: Job!
+    technician: User!
+    notes: String
+    status: ReportStatus!
+    submittedAt: String
+    createdAt: String!
+    updatedAt: String!
+}
+
 #=== QUERIES ===
 
 type Query{
@@ -113,6 +129,9 @@ type Query{
 
     #Dashboard queries
     dashboardStats: DashboardStats!
+
+    #Report queries
+    myReports(status: ReportStatus): [Report!]!
 }
 
 #=== MUTATIONS ===
@@ -160,6 +179,9 @@ type Mutation {
 
     #Notification
     markNotificationRead(id: ID!): Notification!
+
+    #Reports
+    submitReport(jobId: ID!, notes: String!): Report!
 }
 
 `;

@@ -4,7 +4,6 @@ import {
   Clock, 
   MapPin, 
   AlertCircle, 
-  UserPlus, 
   CheckCircle, 
   Trash2, 
   Edit,
@@ -12,6 +11,7 @@ import {
 } from "lucide-react";
 import Button from "../../components/ui/Button";
 import StatusBadge from "../../components/StatusBadge";
+import { formatPriority } from "../../utils/formatters";
 
 // 1. Define the Job structure
 type Job = {
@@ -20,9 +20,9 @@ type Job = {
   description: string;
   category: string;
   client: { name: string; phone: string; address: string };
-  assignedTech: { name: string; id: string } | null;
-  status: "success" | "pending" | "error" | "in-progress";
-  priority: "High" | "Medium" | "Low";
+  assignedTech: { name: string; id: string };
+  status: "PENDING" | "IN_PROGRESS" | "COMPLETED" | "VERIFIED" | "CANCELLED";
+  priority: "HIGH" | "MEDIUM" | "LOW";
   dateCreated: string;
   deadline: string;
 };
@@ -36,8 +36,8 @@ const mockJobs: Job[] = [
     category: "Networking",
     client: { name: "Robert Shoal", phone: "+1 234 567 8900", address: "123 Tech Park, Bldg 4" },
     assignedTech: { name: "John Smith", id: "TCH 1001" },
-    status: "in-progress",
-    priority: "High",
+    status: "IN_PROGRESS",
+    priority: "HIGH",
     dateCreated: "2026-06-14",
     deadline: "2026-07-04",
   },
@@ -47,9 +47,9 @@ const mockJobs: Job[] = [
     description: "Main server rack in the basement is completely unresponsive. Suspected blown fuse or faulty PDU.",
     category: "Electrical",
     client: { name: "Sarah Connor", phone: "+1 987 654 3210", address: "Cyberdyne Systems HQ" },
-    assignedTech: null,
-    status: "pending",
-    priority: "High",
+    assignedTech: { name: "Sarah Connor", id: "TCH 1002" },
+    status: "PENDING",
+    priority: "HIGH",
     dateCreated: "2026-06-15",
     deadline: "2026-06-16",
   },
@@ -60,8 +60,8 @@ const mockJobs: Job[] = [
     category: "HVAC",
     client: { name: "Acme Corp", phone: "+1 555 123 4567", address: "99 Industrial Way" },
     assignedTech: { name: "Mike Johnson", id: "TCH 1045" },
-    status: "success",
-    priority: "Low",
+    status: "COMPLETED",
+    priority: "LOW",
     dateCreated: "2026-06-10",
     deadline: "2026-06-20",
   }
@@ -108,7 +108,7 @@ export default function Jobs() {
                 <div className="flex justify-between items-start w-full mb-1">
                   <div className="flex items-center gap-2">
                     <span className="text-xs font-bold text-primary">{job.id}</span>
-                    {job.priority === "High" && <AlertCircle size={12} className="text-danger shrink-0" />}
+                    {job.priority === "HIGH" && <AlertCircle size={12} className="text-danger shrink-0" />}
                   </div>
                   {/* Mobile Status Badge */}
                   <div className="xl:hidden shrink-0">
@@ -130,19 +130,15 @@ export default function Jobs() {
               {/* Tech Col */}
               <div className="xl:col-span-3 flex items-center gap-2">
                 <span className="text-xs font-bold text-fg-muted uppercase xl:hidden">Tech:</span>
-                {job.assignedTech ? (
-                  <div className="flex items-center gap-2 w-full overflow-hidden">
-                    <div className="w-6 h-6 xl:w-8 xl:h-8 rounded-full bg-border flex items-center justify-center text-[10px] xl:text-xs text-fg-muted font-bold shrink-0">
-                      {job.assignedTech.name.charAt(0)}
-                    </div>
-                    <div className="overflow-hidden">
-                      <p className="text-sm font-medium text-fg truncate">{job.assignedTech.name}</p>
-                      <p className="hidden xl:block text-xs text-fg-muted truncate">{job.assignedTech.id}</p>
-                    </div>
+                <div className="flex items-center gap-2 w-full overflow-hidden">
+                  <div className="w-6 h-6 xl:w-8 xl:h-8 rounded-full bg-border flex items-center justify-center text-[10px] xl:text-xs text-fg-muted font-bold shrink-0">
+                    {job.assignedTech.name.charAt(0)}
                   </div>
-                ) : (
-                  <span className="text-sm text-fg-muted italic">Unassigned</span>
-                )}
+                  <div className="overflow-hidden">
+                    <p className="text-sm font-medium text-fg truncate">{job.assignedTech.name}</p>
+                    <p className="hidden xl:block text-xs text-fg-muted truncate">{job.assignedTech.id}</p>
+                  </div>
+                </div>
               </div>
 
               {/* Timeline Col */}
@@ -191,11 +187,11 @@ export default function Jobs() {
                 <div className="hidden sm:block"><StatusBadge status={selectedJob.status} /></div>
               </div>
               <span className={`text-xs font-bold px-2 py-1 rounded border ${
-                selectedJob.priority === 'High' ? 'text-danger border-danger/20 bg-danger/5' : 
-                selectedJob.priority === 'Medium' ? 'text-yellow-600 border-yellow-600/20 bg-yellow-600/5' : 
+                selectedJob.priority === 'HIGH' ? 'text-danger border-danger/20 bg-danger/5' : 
+                selectedJob.priority === 'MEDIUM' ? 'text-yellow-600 border-yellow-600/20 bg-yellow-600/5' : 
                 'text-success border-success/20 bg-success/5'
               }`}>
-                {selectedJob.priority} <span className="hidden sm:inline">Priority</span>
+                {formatPriority(selectedJob.priority)} <span className="hidden sm:inline">Priority</span>
               </span>
             </div>
 
@@ -237,17 +233,8 @@ export default function Jobs() {
                 
                 {/* Technician Box */}
                 <div className="bg-bg-light border border-border-muted p-4 rounded-lg flex flex-col items-center justify-center text-center sm:min-h-25 hover:border-primary transition-colors cursor-pointer group">
-                  {selectedJob.assignedTech ? (
-                    <>
-                      <p className="text-xs text-fg-muted mb-1">Technician</p>
-                      <p className="text-sm font-bold text-fg">{selectedJob.assignedTech.name}</p>
-                    </>
-                  ) : (
-                    <>
-                      <UserPlus size={20} className="text-primary mb-1 group-hover:scale-110 transition-transform" />
-                      <p className="text-sm font-bold text-primary">+ Assign Tech</p>
-                    </>
-                  )}
+                  <p className="text-xs text-fg-muted mb-1">Technician</p>
+                  <p className="text-sm font-bold text-fg">{selectedJob.assignedTech.name}</p>
                 </div>
               </div>
 

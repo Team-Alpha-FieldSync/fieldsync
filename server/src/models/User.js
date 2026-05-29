@@ -46,7 +46,7 @@ const userSchema = new mongoose.Schema(
             type: String,
             enum: {
                 values: Object.values(JOB_CATEGORY),
-                message: '{Value} is not a valid specialization',
+                message: '{VALUE} is not a valid specialization',
             },
             required: function(){
                 return this.role === ROLES.TECHNICIAN;

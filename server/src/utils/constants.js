@@ -29,7 +29,7 @@ export const JOB_PRIORITY = {
 export const JOB_CATEGORY = {
     NETWORKING: 'networking',
     ELECTRICAL: 'electrical',
-    HVAC: 'havac',
+    HVAC: 'hvac',
     PLUMBING: 'plumbing',
     OTHER: 'other',
 };
@@ -37,4 +37,9 @@ export const JOB_CATEGORY = {
 export const AVAILABILITY = {
     AVAILABLE: 'available',
     UNAVAILABLE: 'unavailable',
+};
+
+export const REPORT_STATUS = {
+    PENDING: 'pending',
+    SUBMITTED: 'submitted',
 };

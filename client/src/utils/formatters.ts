@@ -38,3 +38,10 @@ export function formatStatus(status: string): string {
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
     .join(" ");
 }
+
+/**
+ * Formats a priority value for display (e.g. "HIGH" → "High").
+ */
+export function formatPriority(priority: string): string {
+  return priority.charAt(0).toUpperCase() + priority.slice(1).toLowerCase();
+}

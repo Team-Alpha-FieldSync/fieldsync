@@ -1,7 +1,8 @@
 import { graphql, GraphQLError } from "graphql";
 import Job from "../../models/Job.js";
 import User from "../../models/User.js";
-import { ROLES, JOB_STATUS } from "../../utils/constants.js";
+import Report from "../../models/Report.js";
+import { ROLES, JOB_STATUS, REPORT_STATUS } from "../../utils/constants.js";
 import {
   requireAuth,
   requireAdmin,
@@ -132,6 +133,22 @@ export default {
 
       job.status = newStatus;
       await job.save();
+
+      //When a job is completed, open a pending field report for the technician
+      //(so it surfaces under "Pending Reports" until they submit it)
+      if (newStatus === JOB_STATUS.COMPLETED) {
+        const existing = await Report.findOne({
+          job: job._id,
+          technician: user.userId,
+        });
+        if (!existing) {
+          await Report.create({
+            job: job._id,
+            technician: user.userId,
+            status: REPORT_STATUS.PENDING,
+          });
+        }
+      }
 
       //TODO (notification ticket): trigger a status_changed notification
 

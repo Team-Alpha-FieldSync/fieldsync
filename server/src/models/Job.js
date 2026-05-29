@@ -35,7 +35,7 @@ const jobSchema = new mongoose.Schema(
             required: [true, 'Category is required'],
             enum: {
                 values: Object.values(JOB_CATEGORY),
-                message: '{Value} is not a valid category',
+                message: '{VALUE} is not a valid category',
             },
         },
         deadline: {

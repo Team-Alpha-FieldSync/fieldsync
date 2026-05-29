@@ -1,6 +1,5 @@
 import mongoose from 'mongoose';
-
-const REPORT_STATUS = { PENDING: 'pending', SUBMITTED: 'submitted' };
+import { REPORT_STATUS } from '../utils/constants.js';
 
 const reportSchema = new mongoose.Schema(
     {

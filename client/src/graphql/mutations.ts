@@ -24,6 +24,9 @@ export const CREATE_TECHNICIAN_MUTATION = gql`
       name
       email
       role
+      phone
+      specialization
+      availability
       createdAt
     }
   }
@@ -51,6 +54,9 @@ export const CREATE_JOB_MUTATION = gql`
       description
       location
       status
+      priority
+      category
+      deadline
       createdAt
       technician {
         id

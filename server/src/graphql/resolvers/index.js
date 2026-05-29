@@ -2,7 +2,9 @@ import authResolvers from './auth.js';
 import userResolvers from './user.js';
 import jobResolvers from './job.js';
 import enumResolvers from './enums.js'
+import statsResolvers from './stats.js'
 import notificationResolvers from './notification.js';
+import stats from './stats.js';
 
 //Merging resolvers from each file.
 //Each one contributes its fields, and any type-level field resolvers.
@@ -12,6 +14,7 @@ const resolvers = {
         ...userResolvers.Query,
         ...jobResolvers.Query,
         ...notificationResolvers.Query,
+        ...statsResolvers.Query,
     },
     Mutation: {
         ...authResolvers.Mutation,

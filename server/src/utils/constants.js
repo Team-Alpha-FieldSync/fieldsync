@@ -19,3 +19,22 @@ export const NOTIFICATION_TYPE = {
     JOB_VERIFIED: 'job_verified',
     SYSTEM_ALERT: 'system_alert',
 };
+
+export const JOB_PRIORITY = {
+    HIGH: 'high',
+    MEDIUM: 'medium',
+    LOW: 'low',
+};
+
+export const JOB_CATEGORY = {
+    NETWORKING: 'networking',
+    ELECTRICAL: 'electrical',
+    HVAC: 'havac',
+    PLUMBING: 'plumbing',
+    OTHER: 'other',
+};
+
+export const AVAILABILITY = {
+    AVAILABLE: 'available',
+    UNAVAILABLE: 'unavailable',
+};

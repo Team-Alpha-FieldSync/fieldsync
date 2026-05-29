@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import { JOB_STATUS } from '../utils/constants.js';
+import { JOB_CATEGORY, JOB_STATUS, JOB_PRIORITY } from '../utils/constants.js';
 
 const jobSchema = new mongoose.Schema(
     {
@@ -22,6 +22,26 @@ const jobSchema = new mongoose.Schema(
             trim: true,
             maxlength: 500,
         }, 
+        priority: {
+            type: String,
+            enum: {
+                values: Object.values(JOB_PRIORITY),
+                message: '{VALUE} is not a valid priority',
+            },
+            default: JOB_PRIORITY.MEDIUM,
+        },
+        category: {
+            type: String,
+            required: [true, 'Category is required'],
+            enum: {
+                values: Object.values(JOB_CATEGORY),
+                message: '{Value} is not a valid category',
+            },
+        },
+        deadline: {
+            type: Date,
+            required: [true, 'Deadline is required'],
+        },
         status: {
             type: String,
             required: true,

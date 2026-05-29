@@ -33,6 +33,9 @@ export const TECHNICIANS_QUERY = gql`
       id
       name
       email
+      phone
+      specialization
+      availability
       role
       createdAt
     }
@@ -60,17 +63,24 @@ const JOB_FIELDS = gql`
     description
     location
     status
+    priority
+    category
+    deadline
     createdAt
     updatedAt
     technician {
       id
       name
       email
+      phone
+      specialization
+      availability
     }
     client {
       id
       name
       email
+      phone
     }
   }
 `;
@@ -103,6 +113,16 @@ export const MY_JOBS_QUERY = gql`
 `;
 
 // --- Dashboard / Notifications ---
+export const DASHBOARD_STATS_QUERY = gql`
+  query DashboardStats {
+    dashboardStats {
+      totalJobs
+      activeTechnicians
+      pendingJobs
+      completedJobs
+    }
+  }
+`;
 
 export const MY_NOTIFICATIONS_QUERY = gql`
   query MyNotifications($unreadOnly: Boolean) {

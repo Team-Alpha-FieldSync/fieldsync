@@ -23,6 +23,30 @@ enum NotificationType{
     SYSTEM_ALERT
 }
 
+enum Priority {
+    HIGH
+    MEDIUM
+    LOW
+}
+
+enum Category {
+    NETWORKING
+    ELECTRICAL
+    HVAC
+    PLUMBING
+    OTHER
+}
+
+enum Availability {
+    AVAILABLE
+    UNAVAILABLE
+}
+
+enum ReportStatus {
+    PENDING
+    SUBMITTED
+}
+
 #=== TYPES ===
 
 type User {
@@ -30,6 +54,9 @@ type User {
     name: String! 
     email: String!
     role: Role!
+    phone: String
+    specialization: Category
+    availability: Availability
     createdBy: User
     createdAt: String!
     updatedAt: String!
@@ -41,6 +68,9 @@ type Job{
     description: String!
     location: String!
     status: JobStatus!
+    priority: Priority!
+    category: Category!
+    deadline: String!
     technician: User!
     client: User!
     createdBy: User!
@@ -51,13 +81,31 @@ type Job{
 type Notification {
     id: ID!
     user: User!
-    job: Job!
+    job: Job
     type: NotificationType!
     message: String!
     read: Boolean!
     delivered: Boolean!
     deliveredAt: String
     createdAt: String!
+}
+
+type DashboardStats {
+    totalJobs: Int!
+    activeTechnicians: Int!
+    pendingJobs: Int!
+    completedJobs: Int!
+}
+
+type Report {
+    id: ID!
+    job: Job!
+    technician: User!
+    notes: String
+    status: ReportStatus!
+    submittedAt: String
+    createdAt: String!
+    updatedAt: String!
 }
 
 #=== QUERIES ===
@@ -78,6 +126,12 @@ type Query{
 
     #Notification queries
     myNotifications(unreadOnly: Boolean): [Notification!]!
+
+    #Dashboard queries
+    dashboardStats: DashboardStats!
+
+    #Report queries
+    myReports(status: ReportStatus): [Report!]!
 }
 
 #=== MUTATIONS ===
@@ -90,6 +144,8 @@ input CreateTechnicianInput{
     name: String!
     email: String!
     password: String!
+    phone: String
+    specialization: Category!
 }
 
 input CreateClientInput{
@@ -101,6 +157,9 @@ input CreateJobInput{
     title: String!
     description: String!
     location: String!
+    priority: Priority
+    category: Category!
+    deadline: String!
     technicianId: ID!
     clientId: ID!
 }
@@ -120,6 +179,9 @@ type Mutation {
 
     #Notification
     markNotificationRead(id: ID!): Notification!
+
+    #Reports
+    submitReport(jobId: ID!, notes: String!): Report!
 }
 
 `;

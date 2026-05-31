@@ -8,6 +8,7 @@ import {
   Phone,
 } from "lucide-react";
 import StatusBadge from "../../components/StatusBadge";
+import { formatPriority } from "../../utils/formatters";
 
 // --- Mock Data Tailored for a Technician ---
 const summaryStats = [
@@ -51,32 +52,32 @@ const myJobs = [
     time: "08:00 AM",
     client: "Stark Industries",
     location: "Manhattan, NY",
-    status: "completed" as const,
-    priority: "Medium",
+    status: "COMPLETED" as const,
+    priority: "MEDIUM",
   },
   {
     id: "JOB-102",
     time: "11:30 AM",
     client: "Acme Corp",
     location: "Brooklyn, NY",
-    status: "in-progress" as const,
-    priority: "High",
+    status: "IN_PROGRESS" as const,
+    priority: "HIGH",
   },
   {
     id: "JOB-103",
     time: "02:00 PM",
     client: "Globex",
     location: "Queens, NY",
-    status: "pending" as const,
-    priority: "Medium",
+    status: "PENDING" as const,
+    priority: "MEDIUM",
   },
   {
     id: "JOB-104",
     time: "04:30 PM",
     client: "Wayne Ent.",
     location: "Staten Island, NY",
-    status: "pending" as const,
-    priority: "Low",
+    status: "PENDING" as const,
+    priority: "LOW",
   },
 ];
 
@@ -121,7 +122,7 @@ export default function TechnicianDashboard() {
             <h2 className="text-lg xl:text-xl font-bold text-fg">
               Current Job
             </h2>
-            <StatusBadge status="in-progress" />
+            <StatusBadge status="IN_PROGRESS" />
           </div>
 
           <div className="space-y-4 xl:space-y-6 flex-1">
@@ -216,14 +217,14 @@ export default function TechnicianDashboard() {
                 <div className="pt-3 flex justify-between items-center border-t border-border-muted mt-1">
                   <span
                     className={`text-xs font-bold px-2 py-1 rounded border ${
-                      job.priority === "High"
+                      job.priority === "HIGH"
                         ? "text-danger border-danger/20 bg-danger/5"
-                        : job.priority === "Medium"
+                        : job.priority === "MEDIUM"
                           ? "text-yellow-600 border-yellow-600/20 bg-yellow-600/5"
                           : "text-success border-success/20 bg-success/5"
                     }`}
                   >
-                    {job.priority} Priority
+                    {formatPriority(job.priority)} Priority
                   </span>
                   <button className="text-primary hover:text-primary/80 font-medium text-sm">
                     View
@@ -260,7 +261,7 @@ export default function TechnicianDashboard() {
                     <td className="p-4">
                       <StatusBadge status={job.status} />
                     </td>
-                    <td className="p-4">{job.priority}</td>
+                    <td className="p-4">{formatPriority(job.priority)}</td>
                     <td className="p-4 text-right">
                       <button className="text-primary hover:text-primary/80 font-medium text-sm">
                         View

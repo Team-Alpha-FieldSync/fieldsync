@@ -1,5 +1,5 @@
 import User from "../../models/User.js";
-import { ROLES } from "../../utils/constants.js";
+import { AVAILABILITY, ROLES } from "../../utils/constants.js";
 import { GraphQLError } from "graphql";
 import { hashPassword } from "../../utils/hashPassword.js";
 import { requireAdmin, requireAuth } from "../../guards/roles.js";
@@ -47,6 +47,7 @@ export default{
                 ...input,
                 password: await hashPassword(input.password),
                 role: ROLES.TECHNICIAN,
+                availability: AVAILABILITY.AVAILABLE,
                 createdBy: user.userId,
             });
         },

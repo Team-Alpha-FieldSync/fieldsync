@@ -10,13 +10,7 @@ type Technician = {
   email: string;
   specialization: string;
   assignment: { title: string; jobId: string } | null;
-  status:
-    | "success"
-    | "pending"
-    | "error"
-    | "in-progress"
-    | "available"
-    | "unavailable"; 
+  status: "AVAILABLE" | "UNAVAILABLE";
   statusLabel: string;
   phone: string;
 };
@@ -29,7 +23,7 @@ const mockTechnicians: Technician[] = [
     email: "jsmith@fieldsync.com",
     specialization: "Electrical",
     assignment: { title: "Light installation", jobId: "#JOB-1327" },
-    status: "available",
+    status: "AVAILABLE",
     statusLabel: "Available",
     phone: "+233 50 678 4335",
   },
@@ -39,7 +33,7 @@ const mockTechnicians: Technician[] = [
     email: "sconnor@fieldsync.com",
     specialization: "Networking",
     assignment: null,
-    status: "unavailable",
+    status: "UNAVAILABLE",
     statusLabel: "Offline",
     phone: "+233 50 111 2222",
   },

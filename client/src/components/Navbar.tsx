@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { Bell, User, Menu, LogOut } from "lucide-react";
 import Button from "./ui/Button";
 import AddJobModal from "./AddJobModal";
@@ -46,15 +46,8 @@ export default function AdminNavbar({ onMenuClick }: { onMenuClick?: () => void 
     <>
       <header className="h-16 px-4 xl:px-8 bg-bg-base border-b border-border-muted flex items-center justify-between sticky top-0 z-30">
         
-        {/* Left Side: Branding, Mobile Menu & Dynamic Title */}
+        {/* Left Side: Mobile Menu & Dynamic Title */}
         <div className="flex items-center gap-3 min-w-0">
-          <Link
-            to="/admin"
-            className="hidden sm:flex items-center gap-2 shrink-0 mr-1"
-          >
-            <div className="w-7 h-7 bg-bg-light border border-border-muted rounded-full shrink-0" />
-            <span className="font-bold text-fg hidden lg:inline">FieldSync</span>
-          </Link>
           <button
             onClick={onMenuClick}
             className="xl:hidden p-2 -ml-2 text-fg-muted hover:text-fg transition-colors"

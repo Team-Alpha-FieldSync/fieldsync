@@ -75,6 +75,7 @@ const JOB_FIELDS = gql`
       phone
       specialization
       availability
+      techCode
     }
     client {
       id
@@ -135,6 +136,25 @@ export const MY_NOTIFICATIONS_QUERY = gql`
       createdAt
       job {
         id
+        title
+        status
+      }
+    }
+  }
+`;
+
+//---------- Reports ----------
+export const MY_REPORTS_QUERY = gql`
+  query MyReports($status: ReportStatus) {
+    myReports(status: $status) {
+      id
+      status
+      notes
+      submittedAt
+      createdAt
+      job {
+        id
+        code
         title
         status
       }

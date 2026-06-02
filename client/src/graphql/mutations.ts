@@ -101,3 +101,15 @@ export const MARK_NOTIFICATION_READ_MUTATION = gql`
     }
   }
 `;
+
+//---------- Reports ----------
+export const SUBMIT_REPORT_MUTATION = gql`
+  mutation SubmitReport($jobId: ID!, $notes: String!) {
+    submitReport(jobId: $jobId, notes: $notes) {
+      id
+      status
+      notes
+      submittedAt
+    }
+  }
+`;

@@ -2,7 +2,7 @@ import { GraphQLError } from "graphql";
 import Job from "../../models/Job.js";
 import User from '../../models/User.js'
 import Notification from '../../models/Notification.js';
-import {requireAuth} from '../../guards/roles.js';
+import {requireAuth, requireTechnician} from '../../guards/roles.js';
 import {ROLES, NOTIFICATION_TYPE} from '../../utils/constants.js';
 
 export default {

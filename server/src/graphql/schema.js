@@ -205,7 +205,7 @@ type Mutation {
 
     #Reports
     submitReport(jobId: ID!, notes: String!): Report!
-    reportIssue(jobId: ID!, message: String!): Report!
+    reportIssue(jobId: ID!, message: String!): Notification!
 }
 
 `;

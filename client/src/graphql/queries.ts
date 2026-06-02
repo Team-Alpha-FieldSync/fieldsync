@@ -36,6 +36,13 @@ export const TECHNICIANS_QUERY = gql`
       phone
       specialization
       availability
+      isActive
+      techCode
+      currentJob {
+        id
+        code
+        title
+      }
       role
       createdAt
     }
@@ -59,6 +66,7 @@ export const CLIENTS_QUERY = gql`
 const JOB_FIELDS = gql`
   fragment JobFields on Job {
     id
+    code
     title
     description
     location

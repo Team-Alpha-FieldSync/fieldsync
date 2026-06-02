@@ -1,4 +1,6 @@
 import User from "../../models/User.js";
+import Job from "../../models/Job.js";
+import { ROLES, JOB_STATUS } from "../../utils/constants.js";
 import { AVAILABILITY, ROLES } from "../../utils/constants.js";
 import { GraphQLError } from "graphql";
 import { hashPassword } from "../../utils/hashPassword.js";
@@ -52,6 +54,19 @@ export default{
             });
         },
 
+        deactivateTechnician: async (_, {id}, {user}) => {
+            requireAdmin(user);
+            const technician = await User.findById(id);
+            if (!technician || technician.role !== ROLES.TECHNICIAN) {
+                throw new GraphQLError("Invalid technician", {
+                    extensions: { code: "BAD_USER_INPUT" },
+                });
+            }
+            technician.isActive = false;
+            await technician.save();
+            return technician;
+        },
+
         createClient:async (_, {input}, {user}) => {
             requireAdmin(user);
 
@@ -78,5 +93,16 @@ export default{
             if(!parent.createdBy)return null;
             return User.findById(parent.createdBy);
         },
+        techCode: (parent) => 
+            parent.techNumber != null ? `TCH ${1000 + parent.techNumber}` : null,
+        currentJob: async (parent) => {
+            if(parent.role !== ROLES.TECHNICIAN) return null;
+            return Job.findOne({
+                technician: parent._id, 
+                status: {$in: [JOB_STATUS.PENDING, JOB_STATUS.IN_PROGRESS]}
+            }).sort({createdAt: -1});
+        },
+        createdAt: (parent) => parent.createdAt.toISOString() ?? null,
+        updatedAt: (parent) => parent.updatedAt.toISOString() ?? null,
     },
 };

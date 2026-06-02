@@ -20,6 +20,10 @@ import {
 } from "../../graphql/queries";
 import { mapJob, type JobNode } from "../../adapters/job";
 import { mapTechnician, type TechNode } from "../../adapters/technician";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import AddJobModal from "../../components/AddJobModal";
+import AddTechnicianModal from "../../components/AddTechnicianModal";
 
 type DashboardStats = {
   totalJobs: number;
@@ -43,6 +47,10 @@ export default function Dashboard() {
   );
   const { data: jobsData } = useQuery<{ jobs: JobNode[] }>(JOBS_QUERY);
   const { data: techData } = useQuery<{ technicians: TechNode[] }>(TECHNICIANS_QUERY);
+
+  const navigate = useNavigate();
+  const [showAddJob, setShowAddJob] = useState(false);
+  const [showAddTech, setShowAddTech] = useState(false);
 
   const stats = statsData?.dashboardStats;
   const recentJobs = (jobsData?.jobs ?? []).map(mapJob).slice(0, 5);
@@ -242,25 +250,28 @@ export default function Dashboard() {
         <div className="bg-bg-base border border-border-muted rounded-xl p-4 xl:p-5 shadow-sm min-h-50 flex flex-col">
           <h3 className="font-bold text-fg mb-4">Quick Actions</h3>
           <div className="grid grid-cols-2 gap-3 flex-1">
-            <button className="flex flex-col items-center justify-center gap-2 border border-border-muted rounded-lg p-2 hover:border-green-600 hover:text-green-700 transition-colors text-fg-muted bg-bg-light/30 hover:bg-bg-light">
+            <button onClick={() => setShowAddJob(true)} className="flex flex-col items-center justify-center gap-2 border border-border-muted rounded-lg p-2 hover:border-green-600 hover:text-green-700 transition-colors text-fg-muted bg-bg-light/30 hover:bg-bg-light">
               <Plus size={20} className="text-green-700" />
               <span className="text-[11px] font-semibold text-center">Add Job</span>
             </button>
-            <button className="flex flex-col items-center justify-center gap-2 border border-border-muted rounded-lg p-2 hover:border-green-600 hover:text-green-700 transition-colors text-fg-muted bg-bg-light/30 hover:bg-bg-light">
+            <button onClick={() => setShowAddTech(true)} className="flex flex-col items-center justify-center gap-2 border border-border-muted rounded-lg p-2 hover:border-green-600 hover:text-green-700 transition-colors text-fg-muted bg-bg-light/30 hover:bg-bg-light">
               <UserPlus size={20} className="text-green-700" />
               <span className="text-[11px] font-semibold text-center">Add Tech</span>
             </button>
-            <button className="flex flex-col items-center justify-center gap-2 border border-border-muted rounded-lg p-2 hover:border-green-600 hover:text-green-700 transition-colors text-fg-muted bg-bg-light/30 hover:bg-bg-light">
+            <button onClick={() => navigate("/admin/jobs")} className="flex flex-col items-center justify-center gap-2 border border-border-muted rounded-lg p-2 hover:border-green-600 hover:text-green-700 transition-colors text-fg-muted bg-bg-light/30 hover:bg-bg-light">
               <FileText size={20} className="text-green-700" />
-              <span className="text-[11px] font-semibold text-center">Report</span>
+              <span className="text-[11px] font-semibold text-center">View Jobs</span>
             </button>
-            <button className="flex flex-col items-center justify-center gap-2 border border-border-muted rounded-lg p-2 hover:border-green-600 hover:text-green-700 transition-colors text-fg-muted bg-bg-light/30 hover:bg-bg-light">
+            <button onClick={() => navigate("/admin/technicians")} className="flex flex-col items-center justify-center gap-2 border border-border-muted rounded-lg p-2 hover:border-green-600 hover:text-green-700 transition-colors text-fg-muted bg-bg-light/30 hover:bg-bg-light">
               <Briefcase size={20} className="text-green-700" />
               <span className="text-[11px] font-semibold text-center">Assign</span>
             </button>
           </div>
         </div>
       </div>
+
+      <AddJobModal isOpen={showAddJob} onClose={() => setShowAddJob(false)} />
+      <AddTechnicianModal isOpen={showAddTech} onClose={() => setShowAddTech(false)} />
     </div>
   );
 }

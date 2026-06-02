@@ -72,6 +72,6 @@ export default {
         user: async (parent) => User.findById(parent.user),
         job: async (parent) => Job.findById(parent.job),
         createdAt: (parent) => parent.createdAt.toISOString() ?? null,
-        deliveredAt: (parent) => parent.deliveredAt.toISOString() ?? null,
+        deliveredAt: (parent) => (parent.deliveredAt ? parent.deliveredAt.toISOString() : null),
     },
 };

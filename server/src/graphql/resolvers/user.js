@@ -1,7 +1,6 @@
 import User from "../../models/User.js";
 import Job from "../../models/Job.js";
-import { ROLES, JOB_STATUS } from "../../utils/constants.js";
-import { AVAILABILITY, ROLES } from "../../utils/constants.js";
+import { AVAILABILITY, ROLES, JOB_STATUS } from "../../utils/constants.js";
 import { GraphQLError } from "graphql";
 import { hashPassword } from "../../utils/hashPassword.js";
 import { requireAdmin, requireAuth } from "../../guards/roles.js";
@@ -77,10 +76,18 @@ export default{
                 });
             }
 
+            if(!input.password || input.password.length < 8){
+                throw new GraphQLError('Password must be at least 8 characters long', {
+                    extensions: {code: 'BAD_USER_INPUT'},
+                });
+            }
+
             //No password - Clients don't authenticate
             return User.create({
                 ...input,
-                role: ROLES.CLIENT,
+                password: await hashPassword(input.password),
+                role: ROLES.TECHNICIAN,
+                availability: AVAILABILITY.AVAILABLE,
                 createdBy: user.userId,
             });
         },

@@ -155,6 +155,7 @@ input CreateTechnicianInput{
 input CreateClientInput{
     name: String!
     email: String!
+    phone: String
 }
 
 input CreateJobInput{

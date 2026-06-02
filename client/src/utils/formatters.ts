@@ -41,6 +41,13 @@ export function formatStatus(status?: string | null): string {
 }
 
 /**
+ * Returns the uppercased first letter of a name, for avatar placeholders.
+ */
+export function getInitial(name?: string | null): string {
+  return name?.trim().charAt(0).toUpperCase() || "?";
+}
+
+/**
  * Formats a priority value for display (e.g. "HIGH" → "High").
  */
 export function formatPriority(priority?: string | null): string {

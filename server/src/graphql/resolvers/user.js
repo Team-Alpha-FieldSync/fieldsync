@@ -66,31 +66,24 @@ export default{
             return technician;
         },
 
-        createClient:async (_, {input}, {user}) => {
+        createClient: async (_, { input }, { user }) => {
             requireAdmin(user);
-
-            const existing = await User.findOne({email: input.email.toLowerCase()});
-            if(existing){
-                throw new GraphQLError('A user with that email already exists',{
-                    extensions: {code: 'BAD_USER_INPUT'},
+        
+            const existing = await User.findOne({ email: input.email.toLowerCase() });
+            if (existing) {
+                throw new GraphQLError('A user with that email already exists', {
+                    extensions: { code: 'BAD_USER_INPUT' },
                 });
             }
-
-            if(!input.password || input.password.length < 8){
-                throw new GraphQLError('Password must be at least 8 characters long', {
-                    extensions: {code: 'BAD_USER_INPUT'},
-                });
-            }
-
+        
             //No password - Clients don't authenticate
             return User.create({
                 ...input,
-                password: await hashPassword(input.password),
-                role: ROLES.TECHNICIAN,
-                availability: AVAILABILITY.AVAILABLE,
+                role: ROLES.CLIENT,
                 createdBy: user.userId,
             });
         },
+
     },
 
     //Resolver for the User.createdBy field

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useQuery } from "@apollo/client/react";
+import { useQuery, useMutation } from "@apollo/client/react";
 import {
   Calendar,
   Clock,
@@ -14,28 +14,48 @@ import Button from "../../components/ui/Button";
 import StatusBadge from "../../components/StatusBadge";
 import { formatPriority } from "../../utils/formatters";
 import { JOBS_QUERY } from "../../graphql/queries";
-import { mapJob, type JobNode, type JobView } from "../../adapters/job";
+import {
+  VERIFY_JOB_MUTATION,
+  CANCEL_JOB_MUTATION,
+  DELETE_JOB_MUTATION,
+  CHANGE_JOB_PRIORITY_MUTATION,
+} from "../../graphql/mutations";
+import { mapJob, type JobNode } from "../../adapters/job";
 
 export default function Jobs() {
-  const [selectedJob, setSelectedJob] = useState<JobView | null>(null);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [actionError, setActionError] = useState<string | null>(null);
 
   const { data, loading, error } = useQuery<{ jobs: JobNode[] }>(JOBS_QUERY);
   const jobs = (data?.jobs ?? []).map(mapJob);
+  const selectedJob = jobs.find((j) => j.rawId === selectedId) ?? null;
+
+  const refetchQueries = [{ query: JOBS_QUERY }];
+  const [verifyJob, { loading: verifying }] = useMutation(VERIFY_JOB_MUTATION, { refetchQueries });
+  const [cancelJob, { loading: cancelling }] = useMutation(CANCEL_JOB_MUTATION, { refetchQueries });
+  const [deleteJob, { loading: deleting }] = useMutation(DELETE_JOB_MUTATION, { refetchQueries });
+  const [changePriority, { loading: changingPriority }] = useMutation(CHANGE_JOB_PRIORITY_MUTATION, { refetchQueries });
+
+  const run = async (fn: () => Promise<unknown>) => {
+    setActionError(null);
+    try {
+      await fn();
+    } catch (e) {
+      setActionError(e instanceof Error ? e.message : "Action failed");
+    }
+  };
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center h-full p-6 text-fg-muted">
-        Loading jobs…
-      </div>
-    );
+    return <div className="flex items-center justify-center h-full p-6 text-fg-muted">Loading jobs…</div>;
   }
   if (error) {
-    return (
-      <div className="flex items-center justify-center h-full p-6 text-danger">
-        Failed to load jobs: {error.message}
-      </div>
-    );
+    return <div className="flex items-center justify-center h-full p-6 text-danger">Failed to load jobs: {error.message}</div>;
   }
+
+  const canVerify = selectedJob?.status === "COMPLETED";
+  const canChangePriority = selectedJob?.status === "PENDING" || selectedJob?.status === "IN_PROGRESS";
+  const canCancel = selectedJob?.status === "PENDING" || selectedJob?.status === "IN_PROGRESS";
+  const canDelete = selectedJob?.status === "CANCELLED";
 
   return (
     <div className="flex flex-col xl:flex-row gap-4 xl:gap-6 h-full p-4 xl:p-6">
@@ -45,7 +65,6 @@ export default function Jobs() {
           <h2 className="text-lg xl:text-xl font-bold text-fg">All Jobs ({jobs.length})</h2>
         </div>
 
-        {/* 12-Column Table Headers (Hidden on Mobile) */}
         <div className="hidden xl:grid grid-cols-12 gap-4 px-6 py-3 bg-bg-light border-b border-border-muted text-xs font-bold text-fg-muted uppercase tracking-wider">
           <div className="col-span-3">Job Info</div>
           <div className="col-span-2">Client</div>
@@ -54,7 +73,6 @@ export default function Jobs() {
           <div className="col-span-2 text-right">Status</div>
         </div>
 
-        {/* List Rows */}
         <div className="divide-y divide-border-muted overflow-y-auto">
           {jobs.length === 0 ? (
             <div className="p-12 text-center text-sm text-fg-muted">No jobs found.</div>
@@ -62,12 +80,11 @@ export default function Jobs() {
             jobs.map((job) => (
               <div
                 key={job.rawId}
-                onClick={() => setSelectedJob(job)}
+                onClick={() => setSelectedId(job.rawId)}
                 className={`flex flex-col xl:grid xl:grid-cols-12 gap-3 xl:gap-4 p-4 xl:px-6 xl:py-4 xl:items-center cursor-pointer transition-colors hover:bg-bg-light ${
-                  selectedJob?.rawId === job.rawId ? "bg-primary/5 border-l-4 border-l-primary" : "border-l-4 border-l-transparent"
+                  selectedId === job.rawId ? "bg-primary/5 border-l-4 border-l-primary" : "border-l-4 border-l-transparent"
                 }`}
               >
-                {/* Job Info Col */}
                 <div className="xl:col-span-3 xl:pr-2 overflow-hidden w-full">
                   <div className="flex justify-between items-start w-full mb-1">
                     <div className="flex items-center gap-2">
@@ -84,13 +101,11 @@ export default function Jobs() {
                   </p>
                 </div>
 
-                {/* Client Col */}
                 <div className="xl:col-span-2 text-sm text-fg truncate flex items-center gap-2">
                   <span className="text-xs font-bold text-fg-muted uppercase xl:hidden">Client:</span>
                   {job.client.name}
                 </div>
 
-                {/* Tech Col */}
                 <div className="xl:col-span-3 flex items-center gap-2">
                   <span className="text-xs font-bold text-fg-muted uppercase xl:hidden">Tech:</span>
                   <div className="flex items-center gap-2 w-full overflow-hidden">
@@ -104,7 +119,6 @@ export default function Jobs() {
                   </div>
                 </div>
 
-                {/* Timeline Col */}
                 <div className="xl:col-span-2 flex flex-row xl:flex-col gap-4 xl:gap-1 mt-2 xl:mt-0">
                   <div className="flex items-center gap-1.5 text-xs text-fg-muted truncate">
                     <Calendar size={12} className="shrink-0" /> {job.dateCreated}
@@ -114,7 +128,6 @@ export default function Jobs() {
                   </div>
                 </div>
 
-                {/* Status Col (Desktop Only) */}
                 <div className="hidden xl:flex col-span-2 justify-end">
                   <StatusBadge status={job.status} />
                 </div>
@@ -134,11 +147,10 @@ export default function Jobs() {
           </div>
         ) : (
           <div className="flex flex-col h-full">
-            {/* Detail Header */}
             <div className="p-4 xl:p-6 border-b border-border-muted flex justify-between items-center bg-bg-light/50">
               <div className="flex items-center gap-2 xl:gap-3">
                 <button
-                  onClick={() => setSelectedJob(null)}
+                  onClick={() => setSelectedId(null)}
                   className="xl:hidden p-1.5 -ml-2 rounded-lg text-fg-muted hover:bg-border-muted transition-colors"
                 >
                   <ChevronLeft size={24} />
@@ -160,7 +172,6 @@ export default function Jobs() {
                 <StatusBadge status={selectedJob.status} />
               </div>
 
-              {/* Title & Meta Info */}
               <div>
                 <h3 className="font-bold text-xl text-fg mb-4">{selectedJob.title}</h3>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 border-y border-border-muted py-4">
@@ -179,7 +190,6 @@ export default function Jobs() {
                 </div>
               </div>
 
-              {/* Assignment Boxes */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="bg-bg-light border border-border-muted p-4 rounded-lg flex flex-col items-center justify-center text-center sm:min-h-25">
                   <p className="text-xs text-fg-muted mb-1">Client</p>
@@ -191,7 +201,6 @@ export default function Jobs() {
                 </div>
               </div>
 
-              {/* Description */}
               <div>
                 <h4 className="text-sm font-bold text-fg mb-2">Issue Description</h4>
                 <div className="bg-bg-light border border-border-muted rounded-lg p-4 text-sm text-fg leading-relaxed">
@@ -199,20 +208,57 @@ export default function Jobs() {
                 </div>
               </div>
 
-              {/* Action Buttons — wired in Phase 5 using selectedJob.rawId */}
-              <div className="pt-4 border-t border-border-muted grid grid-cols-1 sm:grid-cols-2 gap-3 pb-8 xl:pb-0">
-                <Button variant="secondary" className="w-full justify-center">
-                  <Edit size={16} className="mr-2" /> Edit Details
-                </Button>
-                <Button variant="secondary" className="w-full justify-center">
-                  Change Priority
-                </Button>
-                <Button variant="primary" className="w-full justify-center">
-                  <CheckCircle size={16} className="mr-2" /> Verify & Close
-                </Button>
-                <Button variant="danger" className="w-full justify-center">
-                  <Trash2 size={16} className="mr-2" /> Delete Job
-                </Button>
+              {/* Action Buttons */}
+              <div className="pt-4 border-t border-border-muted space-y-3 pb-8 xl:pb-0">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <Button variant="secondary" disabled title="Editing coming soon" className="w-full justify-center">
+                    <Edit size={16} className="mr-2" /> Edit Details
+                  </Button>
+
+                  <select
+                    value={selectedJob.priority}
+                    disabled={!canChangePriority || changingPriority}
+                    onChange={(e) => run(() => changePriority({ variables: { id: selectedJob.rawId, priority: e.target.value } }))}
+                    className="w-full border border-border rounded-md p-2 text-sm bg-bg-base focus:outline-none focus:border-primary disabled:opacity-50"
+                  >
+                    <option value="HIGH">High Priority</option>
+                    <option value="MEDIUM">Medium Priority</option>
+                    <option value="LOW">Low Priority</option>
+                  </select>
+
+                  <Button
+                    variant="primary"
+                    disabled={!canVerify || verifying}
+                    onClick={() => run(() => verifyJob({ variables: { id: selectedJob.rawId } }))}
+                    className="w-full justify-center"
+                  >
+                    <CheckCircle size={16} className="mr-2" /> {verifying ? "Verifying…" : "Verify & Close"}
+                  </Button>
+
+                  {canDelete ? (
+                    <Button
+                      variant="danger"
+                      disabled={deleting}
+                      onClick={() => run(async () => {
+                        await deleteJob({ variables: { id: selectedJob.rawId } });
+                        setSelectedId(null);
+                      })}
+                      className="w-full justify-center"
+                    >
+                      <Trash2 size={16} className="mr-2" /> {deleting ? "Deleting…" : "Delete Job"}
+                    </Button>
+                  ) : (
+                    <Button
+                      variant="danger"
+                      disabled={!canCancel || cancelling}
+                      onClick={() => run(() => cancelJob({ variables: { id: selectedJob.rawId } }))}
+                      className="w-full justify-center"
+                    >
+                      <Trash2 size={16} className="mr-2" /> {cancelling ? "Cancelling…" : "Cancel Job"}
+                    </Button>
+                  )}
+                </div>
+                {actionError && <p className="text-sm text-danger">{actionError}</p>}
               </div>
             </div>
           </div>

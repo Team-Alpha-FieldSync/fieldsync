@@ -59,6 +59,6 @@ export default {
     technician: async (parent) => User.findById(parent.technician),
     createdAt: (parent) => parent.createdAt.toISOString() ?? null,
     updatedAt: (parent) => parent.updatedAt.toISOString() ?? null,
-    submittedAt: (parent) => parent.submittedAt.toISOString() ?? null,
+    submittedAt: (parent) => (parent.submittedAt ? parent.submittedAt.toISOString() : null),
   },
 };

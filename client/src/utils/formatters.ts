@@ -31,7 +31,8 @@ export function truncateText(text: string, maxLength: number): string {
 /**
  * Formats a status value for display (e.g. "IN_PROGRESS" → "In Progress").
  */
-export function formatStatus(status: string): string {
+export function formatStatus(status?: string | null): string {
+  if (!status) return "—";
   return status
     .toLowerCase()
     .split("_")
@@ -42,6 +43,7 @@ export function formatStatus(status: string): string {
 /**
  * Formats a priority value for display (e.g. "HIGH" → "High").
  */
-export function formatPriority(priority: string): string {
+export function formatPriority(priority?: string | null): string {
+  if (!priority) return "—";
   return priority.charAt(0).toUpperCase() + priority.slice(1).toLowerCase();
 }

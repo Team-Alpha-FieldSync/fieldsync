@@ -84,11 +84,10 @@ jobSchema.index({status: 1});               //Admin filter by status
 jobSchema.index({client: 1});               //jobs for a specific client
 jobSchema.index({createdAt: -1});           //newest-first sort
 
-jobSchema.pre('save', async function(next) {
+jobSchema.pre('save', async function() {
     if(this.isNew && this.jobNumber == null){
         this.jobNumber = await getNextSequence('job');
     }
-    next();
 });
 
 export default mongoose.model('Job', jobSchema);

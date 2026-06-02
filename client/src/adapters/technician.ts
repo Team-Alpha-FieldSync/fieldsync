@@ -7,7 +7,7 @@ export type TechNode = {
   name: string;
   email: string;
   phone?: string | null;
-  specialization: string;
+  specialization?: string | null;
   availability: TechAvailability;
   isActive: boolean;
   techCode?: string | null;

@@ -14,8 +14,8 @@ export type JobNode = {
   category: string;
   deadline: string;
   createdAt: string;
-  technician: { id: string; name: string; techCode?: string | null; phone?: string | null };
-  client: { id: string; name: string; phone?: string | null };
+  technician?: { id: string; name: string; techCode?: string | null; phone?: string | null } | null;
+  client?: { id: string; name: string; phone?: string | null } | null;
 };
 
 export type JobView = {
@@ -53,10 +53,10 @@ export type MyJobView = {
       description: node.description,
       category: formatStatus(node.category),
       client: {
-        name: node.client.name,
-        phone: node.client.phone ?? "",
+        name: node.client?.name ?? "Unknown client",
+        phone: node.client?.phone ?? "",
         address: node.location,
-        contactPerson: node.client.name,
+        contactPerson: node.client?.name ?? "Unknown client",
       },
       status: node.status,
       priority: node.priority,
@@ -73,13 +73,13 @@ export function mapJob(node: JobNode): JobView {
     description: node.description,
     category: formatStatus(node.category),
     client: {
-      name: node.client.name,
-      phone: node.client.phone ?? "",
+      name: node.client?.name ?? "Unknown client",
+      phone: node.client?.phone ?? "",
       address: node.location,
     },
     assignedTech: {
-      name: node.technician.name,
-      id: node.technician.techCode ?? node.technician.id,
+      name: node.technician?.name ?? "Unassigned",
+      id: node.technician?.techCode ?? node.technician?.id ?? "—",
     },
     status: node.status,
     priority: node.priority,

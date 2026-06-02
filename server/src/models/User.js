@@ -81,11 +81,10 @@ const userSchema = new mongoose.Schema(
     }
 );
 
-userSchema.pre('save', async function(next){
+userSchema.pre('save', async function(){
     if (this.isNew && this.role === ROLES.TECHNICIAN && this.techNumber == null){
         this.techNumber = await getNextSequence('technician');
     }
-    next();
 })
 
 export default mongoose.model('User', userSchema);

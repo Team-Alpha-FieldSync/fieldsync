@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { Bell, User, Menu, LogOut } from "lucide-react";
 import Button from "./ui/Button";
 import AddJobModal from "./AddJobModal";
+import AddTechnicianModal from "./AddTechnicianModal";
 import NotificationsModal from "./NotificationsModel";
 import useAuth from "../hooks/useAuth";
 
@@ -11,9 +12,11 @@ export default function AdminNavbar({ onMenuClick }: { onMenuClick?: () => void 
   const navigate = useNavigate();
   const { user, logout } = useAuth();
   
-  // 3. State to control the modals
+  // State to control the modals
   const [isAddJobModalOpen, setIsAddJobModalOpen] = useState(false);
-  // 2. Add state for the Notifications Modal
+  // State for Tech Modal
+  const [isAddTechModalOpen, setIsAddTechModalOpen] = useState(false);
+  //  Add state for the Notifications Modal
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
 
   const pageConfig: Record<string, { title: string; subtitle: string; actionText: string | null }> = {
@@ -32,6 +35,8 @@ export default function AdminNavbar({ onMenuClick }: { onMenuClick?: () => void 
   const handleActionClick = () => {
     if (currentConfig.actionText === "+ Add Job") {
       setIsAddJobModalOpen(true);
+    } else if (currentConfig.actionText === "+ Add Technician") {
+      setIsAddTechModalOpen(true);
     }
   };
 
@@ -114,6 +119,11 @@ export default function AdminNavbar({ onMenuClick }: { onMenuClick?: () => void 
       <AddJobModal 
         isOpen={isAddJobModalOpen} 
         onClose={() => setIsAddJobModalOpen(false)} 
+      />
+
+      <AddTechnicianModal 
+        isOpen={isAddTechModalOpen}
+        onClose={() => setIsAddTechModalOpen(false)} 
       />
       
       {/* 4. Render the Notifications Modal */}

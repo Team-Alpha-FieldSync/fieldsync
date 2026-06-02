@@ -38,6 +38,7 @@ export const CREATE_CLIENT_MUTATION = gql`
       id
       name
       email
+      phone
       role
       createdAt
     }

@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useQuery, useMutation } from "@apollo/client/react";
+import AddClientModal from "./AddClientModal";
 import Modal from "./ui/Modal";
 import Button from "./ui/Button";
 import {
@@ -45,6 +46,7 @@ const INITIAL_FORM = {
 
 export default function AddJobModal({ isOpen, onClose }: AddJobModalProps) {
   const [form, setForm] = useState(INITIAL_FORM);
+  const [showAddClient, setShowAddClient] = useState(false);
 
   // Populate the dropdowns. Skip while closed to avoid needless fetches.
   const { data: clientsData } = useQuery<{ clients: UserOption[] }>(
@@ -121,9 +123,16 @@ export default function AddJobModal({ isOpen, onClose }: AddJobModalProps) {
         {/* Client & Category Row */}
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-fg mb-1">
-              Client
-            </label>
+            <div className="flex items-center justify-between mb-1">
+              <label className="block text-sm font-medium text-fg">Client</label>
+              <button
+                type="button"
+                onClick={() => setShowAddClient(true)}
+                className="text-xs font-semibold text-primary hover:underline"
+              >
+                + New
+              </button>
+            </div>
             <select
               name="clientId"
               value={form.clientId}
@@ -265,6 +274,13 @@ export default function AddJobModal({ isOpen, onClose }: AddJobModalProps) {
           </Button>
         </div>
       </form>
+      <AddClientModal
+        isOpen={showAddClient}
+        onClose={() => setShowAddClient(false)}
+        onCreated={(client) => {
+          setForm((prev) => ({ ...prev, clientId: client.id }));
+        }}
+      />
     </Modal>
   );
 }

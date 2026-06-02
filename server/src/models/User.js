@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import { getNextSequence } from './Counter.js';
 import { AVAILABILITY, JOB_CATEGORY, ROLES } from '../utils/constants.js';
 
 const userSchema = new mongoose.Schema(
@@ -60,6 +61,15 @@ const userSchema = new mongoose.Schema(
             },
             default: AVAILABILITY.AVAILABLE,
         },
+        techNumber: {
+            type: Number,
+            unique: true,
+            sparse: true,
+        },
+        isActive: {
+            type: Boolean,
+            default: true,
+        },
         createdBy: {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'User',
@@ -71,6 +81,11 @@ const userSchema = new mongoose.Schema(
     }
 );
 
-
+userSchema.pre('save', async function(next){
+    if (this.isNew && this.role === ROLES.TECHNICIAN && this.techNumber == null){
+        this.techNumber = await getNextSequence('technician');
+    }
+    next();
+})
 
 export default mongoose.model('User', userSchema);

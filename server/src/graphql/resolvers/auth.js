@@ -23,6 +23,13 @@ export default {
                 });
             }
 
+            //Deactivated technicians (or any disabled account) can't log in
+            if(user.isActive === false){
+                throw new GraphQLError('This account has been deactivated', {
+                    extensions: {code: 'FORBIDDEN'},
+                });
+            }
+
             const isValid = await comparePassword(password, user.password);
 
             if (!isValid){

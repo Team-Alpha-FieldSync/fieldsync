@@ -57,6 +57,9 @@ type User {
     phone: String
     specialization: Category
     availability: Availability
+    isActive: Boolean!
+    techCode: String
+    currentJob: Job
     createdBy: User
     createdAt: String!
     updatedAt: String!
@@ -64,6 +67,7 @@ type User {
 
 type Job{
     id: ID!
+    code: String!
     title: String!
     description: String!
     location: String!
@@ -116,7 +120,7 @@ type Query{
 
     #User queries(Admin only)
     users(role: Role): [User!]!
-    technicians: [User!]!
+    technicians(activeOnly: Boolean): [User!]!
     clients: [User!]!
 
     #Job queries
@@ -151,6 +155,7 @@ input CreateTechnicianInput{
 input CreateClientInput{
     name: String!
     email: String!
+    phone: String
 }
 
 input CreateJobInput{
@@ -162,6 +167,14 @@ input CreateJobInput{
     deadline: String!
     technicianId: ID!
     clientId: ID!
+}
+
+input UpdateJobInput{
+    title: String
+    description: String
+    location: String
+    category: Category
+    deadline: String
 }
 
 type Mutation {
@@ -177,11 +190,22 @@ type Mutation {
     updateJobStatus(id: ID!, status: JobStatus!): Job!
     verifyJob(id: ID!): Job!
 
+    #Job actions (Admin only)
+    updateJob(id: ID!, input: UpdateJobInput!): Job!
+    changeJobPriority(id: ID!, priority: Priority!): Job!
+    reassignJob(id: ID!, technicianId: ID!): Job!
+    cancelJob(id: ID!): Job!
+    deleteJob(id: ID!): Job!
+
+    #Technician actions
+    deactivateTechnician(id: ID!): User!
+
     #Notification
     markNotificationRead(id: ID!): Notification!
 
     #Reports
     submitReport(jobId: ID!, notes: String!): Report!
+    reportIssue(jobId: ID!, message: String!): Notification!
 }
 
 `;

@@ -1,19 +1,23 @@
 import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { Bell, User, Menu, LogOut } from "lucide-react";
+import { Bell, Menu, LogOut } from "lucide-react";
 import Button from "./ui/Button";
 import AddJobModal from "./AddJobModal";
+import AddTechnicianModal from "./AddTechnicianModal";
 import NotificationsModal from "./NotificationsModel";
 import useAuth from "../hooks/useAuth";
+import { getInitial } from "../utils/formatters";
 
 export default function AdminNavbar({ onMenuClick }: { onMenuClick?: () => void }) {
   const location = useLocation();
   const navigate = useNavigate();
   const { user, logout } = useAuth();
   
-  // 3. State to control the modals
+  // State to control the modals
   const [isAddJobModalOpen, setIsAddJobModalOpen] = useState(false);
-  // 2. Add state for the Notifications Modal
+  // State for Tech Modal
+  const [isAddTechModalOpen, setIsAddTechModalOpen] = useState(false);
+  //  Add state for the Notifications Modal
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
 
   const pageConfig: Record<string, { title: string; subtitle: string; actionText: string | null }> = {
@@ -32,6 +36,8 @@ export default function AdminNavbar({ onMenuClick }: { onMenuClick?: () => void 
   const handleActionClick = () => {
     if (currentConfig.actionText === "+ Add Job") {
       setIsAddJobModalOpen(true);
+    } else if (currentConfig.actionText === "+ Add Technician") {
+      setIsAddTechModalOpen(true);
     }
   };
 
@@ -39,8 +45,6 @@ export default function AdminNavbar({ onMenuClick }: { onMenuClick?: () => void 
     logout();
     navigate("/login");
   };
-
-  const roleLabel = user?.role === "ADMIN" ? "Admin" : user?.role ?? "User";
 
   return (
     <>
@@ -91,12 +95,12 @@ export default function AdminNavbar({ onMenuClick }: { onMenuClick?: () => void 
           </button>
 
           <div className="flex items-center gap-2 xl:gap-3 pl-1 xl:pl-2">
-            <div className="w-8 h-8 xl:w-10 xl:h-10 bg-primary/20 text-primary rounded-full flex items-center justify-center border border-primary/30 shrink-0">
-              <User size={18} className="xl:w-5 xl:h-5" />
+            <div className="w-8 h-8 xl:w-10 xl:h-10 bg-primary/20 text-primary rounded-full flex items-center justify-center border border-primary/30 shrink-0 font-bold text-sm xl:text-base">
+              {getInitial(user?.name)}
             </div>
             <div className="hidden xl:block">
-              <p className="text-sm font-bold text-fg leading-tight">{roleLabel}</p>
-              <p className="text-xs text-fg-muted">{user?.email ?? "admin@fieldsync.com"}</p>
+              <p className="text-sm font-bold text-fg leading-tight">{user?.name ?? "Admin"}</p>
+              <p className="text-xs text-fg-muted">{user?.email}</p>
             </div>
             <button
               type="button"
@@ -114,6 +118,11 @@ export default function AdminNavbar({ onMenuClick }: { onMenuClick?: () => void 
       <AddJobModal 
         isOpen={isAddJobModalOpen} 
         onClose={() => setIsAddJobModalOpen(false)} 
+      />
+
+      <AddTechnicianModal 
+        isOpen={isAddTechModalOpen}
+        onClose={() => setIsAddTechModalOpen(false)} 
       />
       
       {/* 4. Render the Notifications Modal */}

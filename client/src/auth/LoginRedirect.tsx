@@ -35,6 +35,7 @@ export default function useLoginRedirect() {
 
       const user: User = {
         id: data.login.user.id,
+        name: data.login.user.name,
         email: data.login.user.email,
         role: data.login.user.role,
       };

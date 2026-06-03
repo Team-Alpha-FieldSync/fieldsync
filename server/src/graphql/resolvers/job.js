@@ -11,6 +11,24 @@ import {
 //Uncomment when notificationService exists
 //import {notify} from '../../services/notificationService.js';
 
+const TECHNICIAN_STATUS_TRANSITIONS = {
+  [JOB_STATUS.PENDING]: [JOB_STATUS.IN_PROGRESS],
+  [JOB_STATUS.IN_PROGRESS]: [JOB_STATUS.COMPLETED],
+};
+
+function assertAssignableTechnician(technician) {
+  if (!technician || technician.role !== ROLES.TECHNICIAN) {
+    throw new GraphQLError("Invalid technician", {
+      extensions: { code: "BAD_USER_INPUT" },
+    });
+  }
+  if (technician.isActive === false) {
+    throw new GraphQLError("Cannot assign jobs to a deactivated technician", {
+      extensions: { code: "BAD_USER_INPUT" },
+    });
+  }
+}
+
 export default {
   Query: {
     //All jobs (admin only)
@@ -66,11 +84,7 @@ export default {
 
       //Verify the technician and client exist with the right roles
       const technician = await User.findById(input.technicianId);
-      if (!technician || technician.role !== ROLES.TECHNICIAN) {
-        throw new GraphQLError("Invalid technician", {
-          extensions: { code: "BAD_USER_INPUT" },
-        });
-      }
+      assertAssignableTechnician(technician);
 
       const client = await User.findById(input.clientId);
       if (!client || client.role !== ROLES.CLIENT) {
@@ -98,6 +112,101 @@ export default {
       return job;
     },
 
+    updateJob: async (_, { id, input }, { user }) => {
+      requireAdmin(user);
+      const job = await Job.findById(id);
+      if (!job) {
+        throw new GraphQLError("Job not found", {
+          extensions: { code: "NOT_FOUND" },
+        });
+      }
+      if(job.status !== JOB_STATUS.PENDING) {
+        throw new GraphQLError("Only pending jobs can be updated", {
+          extensions: { code: "BAD_USER_INPUT" },
+        });
+      }
+      if(input.title != null) job.title = input.title;
+      if(input.description != null) job.description = input.description;
+      if(input.location != null) job.location = input.location;
+      if(input.category != null) job.category = input.category;
+      if(input.deadline != null) job.deadline = input.deadline;
+      await job.save();
+      return job;
+    },
+
+    changeJobPriority: async (_, { id, priority }, { user }) => {
+      requireAdmin(user);
+      const job = await Job.findById(id);
+      if (!job) {
+        throw new GraphQLError("Job not found", {
+          extensions: { code: "NOT_FOUND" },
+        });
+      }
+      if(![JOB_STATUS.PENDING, JOB_STATUS.IN_PROGRESS].includes(job.status)) {
+        throw new GraphQLError("Priority can only change while pending or in progress", {
+          extensions: { code: "BAD_USER_INPUT" },
+        });
+      }
+      job.priority = priority;
+      await job.save();
+      return job;
+    },
+
+    reassignJob: async (_, { id, technicianId }, { user }) => {
+      requireAdmin(user);
+      const job = await Job.findById(id);
+      if (!job) {
+        throw new GraphQLError("Job not found", {
+          extensions: { code: "NOT_FOUND" },
+        });
+      }
+      if(job.status !== JOB_STATUS.PENDING) {
+        throw new GraphQLError("Only pending jobs can be reassigned", {
+          extensions: { code: "BAD_USER_INPUT" },
+        });
+      }
+      const technician = await User.findById(technicianId);
+      assertAssignableTechnician(technician);
+      job.technician = technicianId;
+      await job.save();
+      return job;
+    },
+
+    cancelJob: async (_, { id }, { user }) => {
+      requireAdmin(user);
+      const job = await Job.findById(id);
+      if (!job) {
+        throw new GraphQLError("Job not found", {
+          extensions: { code: "NOT_FOUND" },
+        });
+      }
+      if(![JOB_STATUS.PENDING, JOB_STATUS.IN_PROGRESS].includes(job.status)) {
+        throw new GraphQLError("Only pending or in progress jobs can be cancelled", {
+          extensions: { code: "BAD_USER_INPUT" },
+        });
+      }
+      job.status = JOB_STATUS.CANCELLED;
+      await job.save();
+      return job;
+    },
+
+    deleteJob: async (_, { id }, { user }) => {
+      requireAdmin(user);
+      const job = await Job.findById(id);
+      if (!job) {
+        throw new GraphQLError("Job not found", {
+          extensions: { code: "NOT_FOUND" },
+        });
+      }
+      if(job.status !== JOB_STATUS.CANCELLED) {
+        throw new GraphQLError("Only cancelled jobs can be deleted", {
+          extensions: { code: "BAD_USER_INPUT" },
+        });
+      }
+      await job.deleteOne();
+      return job;
+    },
+
     updateJobStatus: async (_, { id, status }, { user }) => {
       requireAuth(user);
 
@@ -122,13 +231,20 @@ export default {
         );
       }
 
-      //Technicians can move pending -> in_progress -> completed
-      //They cannot mark a job as verified - That is admin only
+      //Technicians can only move pending -> in_progress -> completed
       const newStatus = status.toLowerCase();
       if (newStatus === JOB_STATUS.VERIFIED) {
         throw new GraphQLError("Only an admin can verify a job", {
           extensions: { code: "FORBIDDEN" },
         });
+      }
+
+      const allowedNext = TECHNICIAN_STATUS_TRANSITIONS[job.status];
+      if (!allowedNext || !allowedNext.includes(newStatus)) {
+        throw new GraphQLError(
+          `Invalid status transition from ${job.status} to ${newStatus}`,
+          { extensions: { code: "BAD_USER_INPUT" } },
+        );
       }
 
       job.status = newStatus;
@@ -183,5 +299,12 @@ export default {
     technician: async (parent) => User.findById(parent.technician),
     client: async (parent) => User.findById(parent.client),
     createdBy: async (parent) => User.findById(parent.createdBy),
+    code: (parent) =>
+      parent.jobNumber != null
+        ? `JOB-${parent.jobNumber}`
+        : `JOB-${parent._id.toString().slice(-6)}`,
+    createdAt: (parent) => parent.createdAt.toISOString() ?? null,
+    updatedAt: (parent) => parent.updatedAt.toISOString() ?? null,
+    deadline: (parent) => parent.deadline.toISOString() ?? null,
   },
 };

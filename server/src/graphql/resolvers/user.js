@@ -20,10 +20,12 @@ export default{
             return User.find(filter).sort({createdAt: -1});
         },
 
-        //Shortcut: List all technicians (admin only)
-        technicians: async (_, __, {user}) => {
+        //Shortcut: List all technicians (admin only). activeOnly limits to assignable techs.
+        technicians: async (_, { activeOnly }, { user }) => {
             requireAdmin(user);
-            return User.find({role: ROLES.TECHNICIAN}).sort({createdAt: -1});
+            const filter = { role: ROLES.TECHNICIAN };
+            if (activeOnly) filter.isActive = { $ne: false };
+            return User.find(filter).sort({ createdAt: -1 });
         },
 
         //Shortcut: list all clients (admin only)
@@ -61,6 +63,18 @@ export default{
                     extensions: { code: "BAD_USER_INPUT" },
                 });
             }
+
+            const activeJobCount = await Job.countDocuments({
+                technician: id,
+                status: { $in: [JOB_STATUS.PENDING, JOB_STATUS.IN_PROGRESS] },
+            });
+            if (activeJobCount > 0) {
+                throw new GraphQLError(
+                    `Cannot deactivate: technician has ${activeJobCount} active job(s). Reassign or complete them first.`,
+                    { extensions: { code: "BAD_USER_INPUT" } },
+                );
+            }
+
             technician.isActive = false;
             await technician.save();
             return technician;

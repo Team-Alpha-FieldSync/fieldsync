@@ -11,6 +11,24 @@ import {
 //Uncomment when notificationService exists
 //import {notify} from '../../services/notificationService.js';
 
+const TECHNICIAN_STATUS_TRANSITIONS = {
+  [JOB_STATUS.PENDING]: [JOB_STATUS.IN_PROGRESS],
+  [JOB_STATUS.IN_PROGRESS]: [JOB_STATUS.COMPLETED],
+};
+
+function assertAssignableTechnician(technician) {
+  if (!technician || technician.role !== ROLES.TECHNICIAN) {
+    throw new GraphQLError("Invalid technician", {
+      extensions: { code: "BAD_USER_INPUT" },
+    });
+  }
+  if (technician.isActive === false) {
+    throw new GraphQLError("Cannot assign jobs to a deactivated technician", {
+      extensions: { code: "BAD_USER_INPUT" },
+    });
+  }
+}
+
 export default {
   Query: {
     //All jobs (admin only)
@@ -66,11 +84,7 @@ export default {
 
       //Verify the technician and client exist with the right roles
       const technician = await User.findById(input.technicianId);
-      if (!technician || technician.role !== ROLES.TECHNICIAN) {
-        throw new GraphQLError("Invalid technician", {
-          extensions: { code: "BAD_USER_INPUT" },
-        });
-      }
+      assertAssignableTechnician(technician);
 
       const client = await User.findById(input.clientId);
       if (!client || client.role !== ROLES.CLIENT) {
@@ -152,11 +166,7 @@ export default {
         });
       }
       const technician = await User.findById(technicianId);
-      if (!technician || technician.role !== ROLES.TECHNICIAN) {
-        throw new GraphQLError("Invalid technician", {
-          extensions: { code: "BAD_USER_INPUT" },
-        });
-      }
+      assertAssignableTechnician(technician);
       job.technician = technicianId;
       await job.save();
       return job;
@@ -221,13 +231,20 @@ export default {
         );
       }
 
-      //Technicians can move pending -> in_progress -> completed
-      //They cannot mark a job as verified - That is admin only
+      //Technicians can only move pending -> in_progress -> completed
       const newStatus = status.toLowerCase();
       if (newStatus === JOB_STATUS.VERIFIED) {
         throw new GraphQLError("Only an admin can verify a job", {
           extensions: { code: "FORBIDDEN" },
         });
+      }
+
+      const allowedNext = TECHNICIAN_STATUS_TRANSITIONS[job.status];
+      if (!allowedNext || !allowedNext.includes(newStatus)) {
+        throw new GraphQLError(
+          `Invalid status transition from ${job.status} to ${newStatus}`,
+          { extensions: { code: "BAD_USER_INPUT" } },
+        );
       }
 
       job.status = newStatus;

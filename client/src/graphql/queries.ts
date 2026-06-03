@@ -28,8 +28,8 @@ export const USERS_QUERY = gql`
 `;
 
 export const TECHNICIANS_QUERY = gql`
-  query Technicians {
-    technicians {
+  query Technicians($activeOnly: Boolean) {
+    technicians(activeOnly: $activeOnly) {
       id
       name
       email

@@ -55,7 +55,7 @@ export default function AddJobModal({ isOpen, onClose }: AddJobModalProps) {
   );
   const { data: techniciansData } = useQuery<{ technicians: UserOption[] }>(
     TECHNICIANS_QUERY,
-    { skip: !isOpen }
+    { skip: !isOpen, variables: { activeOnly: true } }
   );
 
   const [createJob, { loading, error }] = useMutation(CREATE_JOB_MUTATION, {

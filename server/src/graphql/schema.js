@@ -120,7 +120,7 @@ type Query{
 
     #User queries(Admin only)
     users(role: Role): [User!]!
-    technicians: [User!]!
+    technicians(activeOnly: Boolean): [User!]!
     clients: [User!]!
 
     #Job queries

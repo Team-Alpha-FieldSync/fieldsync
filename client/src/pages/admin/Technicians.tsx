@@ -177,6 +177,11 @@ export default function Technicians() {
               {/* Assignment Panel */}
               <div className="bg-primary/5 border border-primary/20 rounded-lg p-4 xl:p-5">
                 <h4 className="font-bold text-fg mb-4">Assignment Panel</h4>
+                {!selectedTech.isActive && (
+                  <p className="text-sm text-fg-muted mb-4">
+                    This technician is deactivated and cannot receive job assignments.
+                  </p>
+                )}
                 <div className="space-y-4">
                   <div>
                     <label className="block text-xs font-medium text-fg mb-1">Select Job (pending only)</label>
@@ -220,7 +225,7 @@ export default function Technicians() {
                   <Button
                     variant="primary"
                     className="w-full py-2.5"
-                    disabled={!assignJobId || assigning}
+                    disabled={!assignJobId || assigning || !selectedTech.isActive}
                     onClick={() => run(async () => {
                       await reassignJob({ variables: { id: assignJobId, technicianId: selectedTech.rawId } });
                       setAssignJobId("");
@@ -244,7 +249,12 @@ export default function Technicians() {
                 </button>
                 <button
                   onClick={() => run(() => deactivateTechnician({ variables: { id: selectedTech.rawId } }))}
-                  disabled={!selectedTech.isActive || deactivating}
+                  disabled={!selectedTech.isActive || deactivating || !!selectedTech.assignment}
+                  title={
+                    selectedTech.assignment
+                      ? "Reassign or complete active jobs before deactivating"
+                      : undefined
+                  }
                   className="flex sm:flex-col items-center justify-center gap-3 sm:gap-2 p-3 sm:p-4 border border-border-muted rounded-lg hover:text-danger hover:border-danger transition-colors text-fg-muted bg-danger/5 sm:bg-transparent disabled:opacity-50 disabled:hover:text-fg-muted disabled:hover:border-border-muted"
                 >
                   <UserX size={20} className="sm:mb-1 shrink-0" />

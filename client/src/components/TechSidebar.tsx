@@ -8,12 +8,17 @@ import {
 } from "lucide-react";
 import Button from "./ui/Button";
 import { NavLink } from "react-router-dom";
+import LogoutButton from "./LogoutButton";
+import useAuth from "../hooks/useAuth";
+import { getInitial } from "../utils/formatters";
 
 interface TechSidebarProps {
   onClose?: () => void;
 }
 
 export default function TechSidebar({ onClose }: TechSidebarProps) {
+  const { user } = useAuth();
+
   return (
     <aside className="w-full md:w-64 h-full flex flex-col bg-bg-dark text-fg font-sans border-r border-border-muted overflow-y-auto shadow-xl md:shadow-none relative">
       {onClose && (
@@ -32,13 +37,11 @@ export default function TechSidebar({ onClose }: TechSidebarProps) {
 
       {/* Technician Profile Section */}
       <div className="flex flex-col items-center px-6 mb-8 text-center">
-        <img
-          src="https://images.unsplash.com/photo-1657356217673-4f7000f768b4?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-          alt="Technician"
-          className="w-30 h-30 rounded-full object-cover border-2 border-primary mb-3 shadow-sm"
-        />
-        <h2 className="text-base font-bold text-fg">Marcus Johnson</h2>
-        <p className="text-xs font-medium text-fg-muted">Senior Technician</p>
+        <div className="w-24 h-24 rounded-full bg-primary/20 text-primary border-2 border-primary mb-3 shadow-sm flex items-center justify-center text-3xl font-bold">
+          {getInitial(user?.name)}
+        </div>
+        <h2 className="text-base font-bold text-fg">{user?.name ?? "Technician"}</h2>
+        <p className="text-xs font-medium text-fg-muted">{user?.email}</p>
       </div>
 
       {/* Main Menu */}
@@ -103,6 +106,8 @@ export default function TechSidebar({ onClose }: TechSidebarProps) {
         <Button variant="primary" className="w-full">
           Apply Filters
         </Button>
+        
+        <LogoutButton />
 
       </div>
 

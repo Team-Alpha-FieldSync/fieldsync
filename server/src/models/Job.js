@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
-import { JOB_STATUS } from '../utils/constants.js';
+import { getNextSequence } from './Counter.js';
+import { JOB_CATEGORY, JOB_STATUS, JOB_PRIORITY } from '../utils/constants.js';
 
 const jobSchema = new mongoose.Schema(
     {
@@ -9,6 +10,11 @@ const jobSchema = new mongoose.Schema(
             trim: true,
             minlength: 3,
             maxlength: 200,
+        },
+        jobNumber: {
+            type: Number,
+            required: true,
+            unique: true,
         },
         description: {
             type: String,
@@ -22,6 +28,26 @@ const jobSchema = new mongoose.Schema(
             trim: true,
             maxlength: 500,
         }, 
+        priority: {
+            type: String,
+            enum: {
+                values: Object.values(JOB_PRIORITY),
+                message: '{VALUE} is not a valid priority',
+            },
+            default: JOB_PRIORITY.MEDIUM,
+        },
+        category: {
+            type: String,
+            required: [true, 'Category is required'],
+            enum: {
+                values: Object.values(JOB_CATEGORY),
+                message: '{VALUE} is not a valid category',
+            },
+        },
+        deadline: {
+            type: Date,
+            required: [true, 'Deadline is required'],
+        },
         status: {
             type: String,
             required: true,
@@ -57,5 +83,11 @@ jobSchema.index({technician: 1, status: 1});//Technician Dashboard
 jobSchema.index({status: 1});               //Admin filter by status
 jobSchema.index({client: 1});               //jobs for a specific client
 jobSchema.index({createdAt: -1});           //newest-first sort
+
+jobSchema.pre('validate', async function() {
+    if(this.isNew && this.jobNumber == null){
+        this.jobNumber = await getNextSequence('job');
+    }
+});
 
 export default mongoose.model('Job', jobSchema);

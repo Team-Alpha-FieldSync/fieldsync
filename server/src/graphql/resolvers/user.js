@@ -1,5 +1,6 @@
 import User from "../../models/User.js";
-import { ROLES } from "../../utils/constants.js";
+import Job from "../../models/Job.js";
+import { AVAILABILITY, ROLES, JOB_STATUS } from "../../utils/constants.js";
 import { GraphQLError } from "graphql";
 import { hashPassword } from "../../utils/hashPassword.js";
 import { requireAdmin, requireAuth } from "../../guards/roles.js";
@@ -19,10 +20,12 @@ export default{
             return User.find(filter).sort({createdAt: -1});
         },
 
-        //Shortcut: List all technicians (admin only)
-        technicians: async (_, __, {user}) => {
+        //Shortcut: List all technicians (admin only). activeOnly limits to assignable techs.
+        technicians: async (_, { activeOnly }, { user }) => {
             requireAdmin(user);
-            return User.find({role: ROLES.TECHNICIAN}).sort({createdAt: -1});
+            const filter = { role: ROLES.TECHNICIAN };
+            if (activeOnly) filter.isActive = { $ne: false };
+            return User.find(filter).sort({ createdAt: -1 });
         },
 
         //Shortcut: list all clients (admin only)
@@ -47,20 +50,46 @@ export default{
                 ...input,
                 password: await hashPassword(input.password),
                 role: ROLES.TECHNICIAN,
+                availability: AVAILABILITY.AVAILABLE,
                 createdBy: user.userId,
             });
         },
 
-        createClient:async (_, {input}, {user}) => {
+        deactivateTechnician: async (_, {id}, {user}) => {
             requireAdmin(user);
-
-            const existing = await User.findOne({email: input.email.toLowerCase()});
-            if(existing){
-                throw new GraphQLError('A user with that email already exists',{
-                    extensions: {code: 'BAD_USER_INPUT'},
+            const technician = await User.findById(id);
+            if (!technician || technician.role !== ROLES.TECHNICIAN) {
+                throw new GraphQLError("Invalid technician", {
+                    extensions: { code: "BAD_USER_INPUT" },
                 });
             }
 
+            const activeJobCount = await Job.countDocuments({
+                technician: id,
+                status: { $in: [JOB_STATUS.PENDING, JOB_STATUS.IN_PROGRESS] },
+            });
+            if (activeJobCount > 0) {
+                throw new GraphQLError(
+                    `Cannot deactivate: technician has ${activeJobCount} active job(s). Reassign or complete them first.`,
+                    { extensions: { code: "BAD_USER_INPUT" } },
+                );
+            }
+
+            technician.isActive = false;
+            await technician.save();
+            return technician;
+        },
+
+        createClient: async (_, { input }, { user }) => {
+            requireAdmin(user);
+        
+            const existing = await User.findOne({ email: input.email.toLowerCase() });
+            if (existing) {
+                throw new GraphQLError('A user with that email already exists', {
+                    extensions: { code: 'BAD_USER_INPUT' },
+                });
+            }
+        
             //No password - Clients don't authenticate
             return User.create({
                 ...input,
@@ -68,6 +97,7 @@ export default{
                 createdBy: user.userId,
             });
         },
+
     },
 
     //Resolver for the User.createdBy field
@@ -77,5 +107,16 @@ export default{
             if(!parent.createdBy)return null;
             return User.findById(parent.createdBy);
         },
+        techCode: (parent) => 
+            parent.techNumber != null ? `TCH ${1000 + parent.techNumber}` : null,
+        currentJob: async (parent) => {
+            if(parent.role !== ROLES.TECHNICIAN) return null;
+            return Job.findOne({
+                technician: parent._id, 
+                status: {$in: [JOB_STATUS.PENDING, JOB_STATUS.IN_PROGRESS]}
+            }).sort({createdAt: -1});
+        },
+        createdAt: (parent) => parent.createdAt.toISOString() ?? null,
+        updatedAt: (parent) => parent.updatedAt.toISOString() ?? null,
     },
 };

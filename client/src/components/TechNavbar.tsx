@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { Bell, User, Menu, LogOut } from "lucide-react";
+import { Bell, Menu, LogOut } from "lucide-react";
 import NotificationsModal from "./NotificationsModel";
 import useAuth from "../hooks/useAuth";
+import { getInitial } from "../utils/formatters";
 
 export default function TechNavbar({
   onMenuClick,
@@ -43,9 +44,6 @@ export default function TechNavbar({
     navigate("/login");
   };
 
-  const roleLabel =
-    user?.role === "TECHNICIAN" ? "Technician" : user?.role ?? "User";
-
   return (
     <>
       <header className="h-16 px-4 md:px-8 bg-bg-base border-b border-border-muted flex items-center justify-between sticky top-0 z-30">
@@ -84,16 +82,14 @@ export default function TechNavbar({
           </button>
 
           <div className="flex items-center gap-2 md:gap-3 pl-1 md:pl-2">
-            <div className="w-8 h-8 md:w-10 md:h-10 bg-primary/20 text-primary rounded-full flex items-center justify-center border border-primary/30 shrink-0">
-              <User size={18} className="md:w-5 md:h-5" />
+            <div className="w-8 h-8 md:w-10 md:h-10 bg-primary/20 text-primary rounded-full flex items-center justify-center border border-primary/30 shrink-0 font-bold text-sm md:text-base">
+              {getInitial(user?.name)}
             </div>
             <div className="hidden md:block">
               <p className="text-sm font-bold text-fg leading-tight">
-                {roleLabel}
+                {user?.name ?? "Technician"}
               </p>
-              <p className="text-xs text-fg-muted">
-                {user?.email ?? "technician@fieldsync.com"}
-              </p>
+              <p className="text-xs text-fg-muted">{user?.email}</p>
             </div>
             <button
               type="button"

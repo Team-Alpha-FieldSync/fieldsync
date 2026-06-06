@@ -28,11 +28,21 @@ export const USERS_QUERY = gql`
 `;
 
 export const TECHNICIANS_QUERY = gql`
-  query Technicians {
-    technicians {
+  query Technicians($activeOnly: Boolean) {
+    technicians(activeOnly: $activeOnly) {
       id
       name
       email
+      phone
+      specialization
+      availability
+      isActive
+      techCode
+      currentJob {
+        id
+        code
+        title
+      }
       role
       createdAt
     }
@@ -56,21 +66,30 @@ export const CLIENTS_QUERY = gql`
 const JOB_FIELDS = gql`
   fragment JobFields on Job {
     id
+    code
     title
     description
     location
     status
+    priority
+    category
+    deadline
     createdAt
     updatedAt
     technician {
       id
       name
       email
+      phone
+      specialization
+      availability
+      techCode
     }
     client {
       id
       name
       email
+      phone
     }
   }
 `;
@@ -103,6 +122,16 @@ export const MY_JOBS_QUERY = gql`
 `;
 
 // --- Dashboard / Notifications ---
+export const DASHBOARD_STATS_QUERY = gql`
+  query DashboardStats {
+    dashboardStats {
+      totalJobs
+      activeTechnicians
+      pendingJobs
+      completedJobs
+    }
+  }
+`;
 
 export const MY_NOTIFICATIONS_QUERY = gql`
   query MyNotifications($unreadOnly: Boolean) {
@@ -115,6 +144,25 @@ export const MY_NOTIFICATIONS_QUERY = gql`
       createdAt
       job {
         id
+        title
+        status
+      }
+    }
+  }
+`;
+
+//---------- Reports ----------
+export const MY_REPORTS_QUERY = gql`
+  query MyReports($status: ReportStatus) {
+    myReports(status: $status) {
+      id
+      status
+      notes
+      submittedAt
+      createdAt
+      job {
+        id
+        code
         title
         status
       }

@@ -8,7 +8,6 @@ import {
 } from "lucide-react";
 import Button from "./ui/Button";
 import { NavLink } from "react-router-dom";
-import LogoutButton from "./LogoutButton";
 import useAuth from "../hooks/useAuth";
 import { getInitial } from "../utils/formatters";
 
@@ -40,7 +39,9 @@ export default function TechSidebar({ onClose }: TechSidebarProps) {
         <div className="w-24 h-24 rounded-full bg-primary/20 text-primary border-2 border-primary mb-3 shadow-sm flex items-center justify-center text-3xl font-bold">
           {getInitial(user?.name)}
         </div>
-        <h2 className="text-base font-bold text-fg">{user?.name ?? "Technician"}</h2>
+        <h2 className="text-base font-bold text-fg">
+          {user?.name ?? "Technician"}
+        </h2>
         <p className="text-xs font-medium text-fg-muted">{user?.email}</p>
       </div>
 
@@ -106,12 +107,7 @@ export default function TechSidebar({ onClose }: TechSidebarProps) {
         <Button variant="primary" className="w-full">
           Apply Filters
         </Button>
-        
-        <LogoutButton />
-
       </div>
-
-      
     </aside>
   );
 }

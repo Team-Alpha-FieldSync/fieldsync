@@ -5,11 +5,11 @@ import {
   Users,
   Search,
   ChevronDown,
+  Building2,
   X,
 } from "lucide-react";
 import Button from "./ui/Button";
 import { NavLink } from "react-router-dom";
-import LogoutButton from "./LogoutButton";
 
 interface SidebarProps {
   onClose?: () => void;
@@ -63,6 +63,13 @@ export default function Sidebar({ onClose }: SidebarProps) {
               to="/admin/technicians"
             />
           </div>
+          <div onClick={onClose}>
+            <NavItem
+              icon={<Building2 size={20} />}
+              label="Clients"
+              to="/admin/clients"
+            />
+          </div>
         </nav>
       </div>
 
@@ -104,8 +111,6 @@ export default function Sidebar({ onClose }: SidebarProps) {
         <Button variant="primary" className="w-full">
           Apply Filters
         </Button>
-
-        <LogoutButton />
       </div>
     </aside>
   );

@@ -55,6 +55,8 @@ export const CLIENTS_QUERY = gql`
       id
       name
       email
+      phone
+      clientCode
       role
       createdAt
     }

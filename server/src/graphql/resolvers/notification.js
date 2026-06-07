@@ -41,6 +41,17 @@ export default {
             return notification;
         },
 
+        markAllNotificationsRead: async (_, __, { user }) => {
+            requireAuth(user);
+
+            await Notification.updateMany(
+                { user: user.userId, read: false },
+                { read: true },
+            );
+
+            return Notification.find({ user: user.userId }).sort({ createdAt: -1 });
+        },
+
         reportIssue: async (_, {jobId, message}, {user}) => {
             requireTechnician(user);
             const job = await Job.findById(jobId);

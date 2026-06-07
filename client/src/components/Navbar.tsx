@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { useQuery } from "@apollo/client/react";
 import { Bell, Menu, LogOut } from "lucide-react";
+import { MY_NOTIFICATIONS_QUERY } from "../graphql/queries";
 import Button from "./ui/Button";
 import AddJobModal from "./AddJobModal";
 import AddTechnicianModal from "./AddTechnicianModal";
@@ -25,6 +27,12 @@ export default function AdminNavbar({
   const [isAddClientModalOpen, setIsAddClientModalOpen] = useState(false);
   //  Add state for the Notifications Modal
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
+
+  const { data: notificationsData } = useQuery<{
+    myNotifications: { read: boolean }[];
+  }>(MY_NOTIFICATIONS_QUERY);
+  const unreadCount =
+    notificationsData?.myNotifications?.filter((n) => !n.read).length ?? 0;
 
   const pageConfig: Record<
     string,
@@ -116,8 +124,9 @@ export default function AdminNavbar({
             className="relative text-fg-muted hover:text-primary transition-colors bg-bg-light p-2 xl:p-2.5 rounded-full border border-border-muted"
           >
             <Bell size={18} className="xl:w-5 xl:h-5" />
-            {/* Red unread indicator dot */}
-            <span className="absolute top-0 right-0 w-2.5 h-2.5 bg-danger rounded-full border-2 border-bg-base"></span>
+            {unreadCount > 0 && (
+              <span className="absolute top-0 right-0 w-2.5 h-2.5 bg-danger rounded-full border-2 border-bg-base" />
+            )}
           </button>
 
           <div className="flex items-center gap-2 xl:gap-3 pl-1 xl:pl-2">

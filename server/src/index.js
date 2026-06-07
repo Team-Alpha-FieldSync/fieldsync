@@ -3,6 +3,7 @@ import cors from 'cors';
 import express from 'express';
 import connectDB from './config/db.js';
 import { syncAllTechnicianAvailability } from './utils/syncTechnicianAvailability.js';
+import { backfillClientNumbers } from './utils/backfillClientNumbers.js';
 import typeDefs from './graphql/schema.js';
 import resolvers from './graphql/resolvers/index.js'
 import { ApolloServer } from '@apollo/server';
@@ -13,6 +14,7 @@ const start = async () => {
     //Connect to MongoDB
     await connectDB();
     await syncAllTechnicianAvailability();
+    await backfillClientNumbers();
 
     //Initiate Express server
     const app = express();

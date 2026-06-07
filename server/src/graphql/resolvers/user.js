@@ -98,6 +98,55 @@ export default{
             });
         },
 
+        updateClient: async (_, { id, input }, { user }) => {
+            requireAdmin(user);
+
+            const client = await User.findById(id);
+            if (!client || client.role !== ROLES.CLIENT) {
+                throw new GraphQLError("Invalid client", {
+                    extensions: { code: "BAD_USER_INPUT" },
+                });
+            }
+
+            if (input.email != null) {
+                const email = input.email.toLowerCase();
+                const existing = await User.findOne({ email, _id: { $ne: id } });
+                if (existing) {
+                    throw new GraphQLError("A user with that email already exists", {
+                        extensions: { code: "BAD_USER_INPUT" },
+                    });
+                }
+                client.email = email;
+            }
+            if (input.name != null) client.name = input.name;
+            if (input.phone != null) client.phone = input.phone;
+
+            await client.save();
+            return client;
+        },
+
+        deleteClient: async (_, { id }, { user }) => {
+            requireAdmin(user);
+
+            const client = await User.findById(id);
+            if (!client || client.role !== ROLES.CLIENT) {
+                throw new GraphQLError("Invalid client", {
+                    extensions: { code: "BAD_USER_INPUT" },
+                });
+            }
+
+            const jobCount = await Job.countDocuments({ client: id });
+            if (jobCount > 0) {
+                throw new GraphQLError(
+                    `Cannot delete: client has ${jobCount} associated job(s). Remove or reassign jobs first.`,
+                    { extensions: { code: "BAD_USER_INPUT" } },
+                );
+            }
+
+            await client.deleteOne();
+            return client;
+        },
+
     },
 
     //Resolver for the User.createdBy field
@@ -109,6 +158,8 @@ export default{
         },
         techCode: (parent) => 
             parent.techNumber != null ? `TCH ${1000 + parent.techNumber}` : null,
+        clientCode: (parent) =>
+            parent.clientNumber != null ? `CLI ${1000 + parent.clientNumber}` : null,
         currentJob: async (parent) => {
             if(parent.role !== ROLES.TECHNICIAN) return null;
             return Job.findOne({

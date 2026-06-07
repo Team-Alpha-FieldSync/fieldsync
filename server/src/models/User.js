@@ -66,6 +66,11 @@ const userSchema = new mongoose.Schema(
             unique: true,
             sparse: true,
         },
+        clientNumber: {
+            type: Number,
+            unique: true,
+            sparse: true,
+        },
         isActive: {
             type: Boolean,
             default: true,
@@ -84,6 +89,9 @@ const userSchema = new mongoose.Schema(
 userSchema.pre('save', async function(){
     if (this.isNew && this.role === ROLES.TECHNICIAN && this.techNumber == null){
         this.techNumber = await getNextSequence('technician');
+    }
+    if (this.isNew && this.role === ROLES.CLIENT && this.clientNumber == null){
+        this.clientNumber = await getNextSequence('client');
     }
 })
 

@@ -4,7 +4,15 @@ import { AVAILABILITY, ROLES, JOB_STATUS } from "../../utils/constants.js";
 import { GraphQLError } from "graphql";
 import { hashPassword } from "../../utils/hashPassword.js";
 import { requireAdmin, requireAuth } from "../../guards/roles.js";
-import { notifyClientCreated, notifyTechnicianCreated } from "../../services/notificationService.js";
+import {
+    notifyClientCreated,
+    notifyTechnicianCreated,
+    notifyClientUpdated,
+    notifyClientDeleted,
+    notifyTechnicianDeactivated,
+    notifyTechnicianReactivated,
+    notifyTechnicianDeleted,
+} from "../../services/notificationService.js";
 
 export default{
     Query: {
@@ -80,6 +88,51 @@ export default{
 
             technician.isActive = false;
             await technician.save();
+            await notifyTechnicianDeactivated(user.userId, technician);
+            return technician;
+        },
+
+        reactivateTechnician: async (_, {id}, {user}) => {
+            requireAdmin(user);
+            const technician = await User.findById(id);
+            if (!technician || technician.role !== ROLES.TECHNICIAN) {
+                throw new GraphQLError("Invalid technician", {
+                    extensions: { code: "BAD_USER_INPUT" },
+                });
+            }
+            if (technician.isActive !== false) {
+                throw new GraphQLError("Technician is already active", {
+                    extensions: { code: "BAD_USER_INPUT" },
+                });
+            }
+            technician.isActive = true;
+            await technician.save();
+            await notifyTechnicianReactivated(user.userId, technician);
+            return technician;
+        },
+
+        deleteTechnician: async (_, {id}, {user}) => {
+            requireAdmin(user);
+            const technician = await User.findById(id);
+            if (!technician || technician.role !== ROLES.TECHNICIAN) {
+                throw new GraphQLError("Invalid technician", {
+                    extensions: { code: "BAD_USER_INPUT" },
+                });
+            }
+
+            const activeJobCount = await Job.countDocuments({
+                technician: id,
+                status: { $in: [JOB_STATUS.PENDING, JOB_STATUS.IN_PROGRESS] },
+            });
+            if (activeJobCount > 0) {
+                throw new GraphQLError(
+                    `Cannot delete: technician has ${activeJobCount} active job(s). Reassign or complete them first.`,
+                    { extensions: { code: "BAD_USER_INPUT" } },
+                );
+            }
+
+            await technician.deleteOne();
+            await notifyTechnicianDeleted(user.userId, technician);
             return technician;
         },
 
@@ -127,6 +180,7 @@ export default{
             if (input.phone != null) client.phone = input.phone;
 
             await client.save();
+            await notifyClientUpdated(user.userId, client);
             return client;
         },
 
@@ -149,6 +203,7 @@ export default{
             }
 
             await client.deleteOne();
+            await notifyClientDeleted(user.userId, client);
             return client;
         },
 

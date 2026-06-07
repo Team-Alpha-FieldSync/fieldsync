@@ -159,6 +159,23 @@ export const DEACTIVATE_TECHNICIAN_MUTATION = gql`
   }
 `;
 
+export const REACTIVATE_TECHNICIAN_MUTATION = gql`
+  mutation ReactivateTechnician($id: ID!) {
+    reactivateTechnician(id: $id) {
+      id
+      isActive
+    }
+  }
+`;
+
+export const DELETE_TECHNICIAN_MUTATION = gql`
+  mutation DeleteTechnician($id: ID!) {
+    deleteTechnician(id: $id) {
+      id
+    }
+  }
+`;
+
 export const VERIFY_JOB_MUTATION = gql`
   mutation VerifyJob($id: ID!) {
     verifyJob(id: $id) {

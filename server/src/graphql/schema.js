@@ -208,6 +208,8 @@ type Mutation {
 
     #Technician actions
     deactivateTechnician(id: ID!): User!
+    reactivateTechnician(id: ID!): User!
+    deleteTechnician(id: ID!): User!
 
     #Notification
     markNotificationRead(id: ID!): Notification!

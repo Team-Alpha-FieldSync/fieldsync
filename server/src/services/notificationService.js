@@ -128,3 +128,69 @@ export async function notifyTechnicianCreated(adminUserId, technician) {
     message: `New technician added: ${technician.name}${technician.email ? ` (${technician.email})` : ''}.`,
   });
 }
+
+/** Admin is confirmed when a client's details are edited. */
+export async function notifyClientUpdated(adminUserId, client) {
+  return createNotification({
+    userId: adminUserId,
+    type: NOTIFICATION_TYPE.SYSTEM_ALERT,
+    message: `Client updated: ${client.name}.`,
+  });
+}
+
+/** Admin is confirmed when a client is removed from the system. */
+export async function notifyClientDeleted(adminUserId, client) {
+  return createNotification({
+    userId: adminUserId,
+    type: NOTIFICATION_TYPE.SYSTEM_ALERT,
+    message: `Client deleted: ${client.name}.`,
+  });
+}
+
+/** Admin is confirmed when a technician is deactivated. */
+export async function notifyTechnicianDeactivated(adminUserId, technician) {
+  return createNotification({
+    userId: adminUserId,
+    type: NOTIFICATION_TYPE.SYSTEM_ALERT,
+    message: `Technician deactivated: ${technician.name}.`,
+  });
+}
+
+/** Admin is confirmed when a technician is reactivated. */
+export async function notifyTechnicianReactivated(adminUserId, technician) {
+  return createNotification({
+    userId: adminUserId,
+    type: NOTIFICATION_TYPE.SYSTEM_ALERT,
+    message: `Technician reactivated: ${technician.name}.`,
+  });
+}
+
+/** Admin is confirmed when a technician is permanently removed. */
+export async function notifyTechnicianDeleted(adminUserId, technician) {
+  return createNotification({
+    userId: adminUserId,
+    type: NOTIFICATION_TYPE.SYSTEM_ALERT,
+    message: `Technician deleted: ${technician.name}.`,
+  });
+}
+
+/** Admin (job creator) is notified when a technician submits a field report. */
+export async function notifyReportSubmitted(job, technicianName) {
+  const code = formatJobCode(job);
+  return createNotification({
+    userId: job.createdBy,
+    jobId: job._id,
+    type: NOTIFICATION_TYPE.SYSTEM_ALERT,
+    message: `${technicianName ?? 'Technician'} submitted a field report for ${code}.`,
+  });
+}
+
+/** Admin is confirmed when a cancelled job is permanently deleted. */
+export async function notifyJobDeleted(adminUserId, job) {
+  const code = formatJobCode(job);
+  return createNotification({
+    userId: adminUserId,
+    type: NOTIFICATION_TYPE.SYSTEM_ALERT,
+    message: `${code} "${job.title}" was permanently deleted.`,
+  });
+}

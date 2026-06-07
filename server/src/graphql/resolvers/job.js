@@ -17,6 +17,7 @@ import {
   notifyJobVerified,
   notifyJobCancelled,
   notifyJobUpdated,
+  notifyJobDeleted,
 } from "../../services/notificationService.js";
 
 const TECHNICIAN_STATUS_TRANSITIONS = {
@@ -222,6 +223,7 @@ export default {
         });
       }
       await job.deleteOne();
+      await notifyJobDeleted(user.userId, job);
       return job;
     },
 

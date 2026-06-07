@@ -4,6 +4,7 @@ import Job from "../../models/Job.js";
 import User from "../../models/User.js";
 import { REPORT_STATUS } from "../../utils/constants.js";
 import { requireTechnician } from "../../guards/roles.js";
+import { notifyReportSubmitted } from "../../services/notificationService.js";
 
 export default {
   Query: {
@@ -48,6 +49,9 @@ export default {
       report.status = REPORT_STATUS.SUBMITTED;
       report.submittedAt = new Date();
       await report.save();
+
+      const technician = await User.findById(user.userId);
+      await notifyReportSubmitted(job, technician?.name);
 
       return report;
     },

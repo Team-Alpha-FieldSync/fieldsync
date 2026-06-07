@@ -110,3 +110,21 @@ export async function notifySystemAlert(userId, jobId, message) {
     message,
   });
 }
+
+/** Admin is confirmed when a new client is added to the system. */
+export async function notifyClientCreated(adminUserId, client) {
+  return createNotification({
+    userId: adminUserId,
+    type: NOTIFICATION_TYPE.SYSTEM_ALERT,
+    message: `New client added: ${client.name}${client.email ? ` (${client.email})` : ''}.`,
+  });
+}
+
+/** Admin is confirmed when a new technician is added to the system. */
+export async function notifyTechnicianCreated(adminUserId, technician) {
+  return createNotification({
+    userId: adminUserId,
+    type: NOTIFICATION_TYPE.SYSTEM_ALERT,
+    message: `New technician added: ${technician.name}${technician.email ? ` (${technician.email})` : ''}.`,
+  });
+}

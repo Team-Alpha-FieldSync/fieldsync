@@ -4,6 +4,7 @@ import { AVAILABILITY, ROLES, JOB_STATUS } from "../../utils/constants.js";
 import { GraphQLError } from "graphql";
 import { hashPassword } from "../../utils/hashPassword.js";
 import { requireAdmin, requireAuth } from "../../guards/roles.js";
+import { notifyClientCreated, notifyTechnicianCreated } from "../../services/notificationService.js";
 
 export default{
     Query: {
@@ -46,13 +47,15 @@ export default{
                 });
             }
 
-            return User.create({
+            const technician = await User.create({
                 ...input,
                 password: await hashPassword(input.password),
                 role: ROLES.TECHNICIAN,
                 availability: AVAILABILITY.AVAILABLE,
                 createdBy: user.userId,
             });
+            await notifyTechnicianCreated(user.userId, technician);
+            return technician;
         },
 
         deactivateTechnician: async (_, {id}, {user}) => {
@@ -91,11 +94,13 @@ export default{
             }
         
             //No password - Clients don't authenticate
-            return User.create({
+            const client = await User.create({
                 ...input,
                 role: ROLES.CLIENT,
                 createdBy: user.userId,
             });
+            await notifyClientCreated(user.userId, client);
+            return client;
         },
 
         updateClient: async (_, { id, input }, { user }) => {

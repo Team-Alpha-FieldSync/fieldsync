@@ -76,7 +76,7 @@ export default {
     //Field resolvers
     Notification: {
         user: async (parent) => User.findById(parent.user),
-        job: async (parent) => Job.findById(parent.job),
+        job: async (parent) => (parent.job ? Job.findById(parent.job) : null),
         createdAt: (parent) => parent.createdAt.toISOString() ?? null,
         deliveredAt: (parent) => (parent.deliveredAt ? parent.deliveredAt.toISOString() : null),
     },

@@ -3,6 +3,7 @@ import Job from "../../models/Job.js";
 import User from "../../models/User.js";
 import Report from "../../models/Report.js";
 import { ROLES, JOB_STATUS, REPORT_STATUS } from "../../utils/constants.js";
+import { syncTechnicianAvailability } from "../../utils/syncTechnicianAvailability.js";
 import {
   requireAuth,
   requireAdmin,
@@ -106,6 +107,8 @@ export default {
         status: JOB_STATUS.PENDING,
       });
 
+      await syncTechnicianAvailability(input.technicianId);
+
       //TODO (notification ticket): trigger an "assigned" notification
       //await notify(client._id, job._id, 'assigned', '...');
 
@@ -167,8 +170,11 @@ export default {
       }
       const technician = await User.findById(technicianId);
       assertAssignableTechnician(technician);
+      const previousTechnicianId = job.technician?.toString();
       job.technician = technicianId;
       await job.save();
+      await syncTechnicianAvailability(previousTechnicianId);
+      await syncTechnicianAvailability(technicianId);
       return job;
     },
 
@@ -185,8 +191,10 @@ export default {
           extensions: { code: "BAD_USER_INPUT" },
         });
       }
+      const technicianId = job.technician?.toString();
       job.status = JOB_STATUS.CANCELLED;
       await job.save();
+      await syncTechnicianAvailability(technicianId);
       return job;
     },
 
@@ -264,6 +272,7 @@ export default {
             status: REPORT_STATUS.PENDING,
           });
         }
+        await syncTechnicianAvailability(job.technician);
       }
 
       //TODO (notification ticket): trigger a status_changed notification

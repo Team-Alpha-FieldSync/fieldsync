@@ -61,6 +61,7 @@ export default function AddJobModal({ isOpen, onClose }: AddJobModalProps) {
   const [createJob, { loading, error }] = useMutation(CREATE_JOB_MUTATION, {
     refetchQueries: [
       { query: JOBS_QUERY },
+      { query: TECHNICIANS_QUERY },
       { query: DASHBOARD_STATS_QUERY },
     ],
   });

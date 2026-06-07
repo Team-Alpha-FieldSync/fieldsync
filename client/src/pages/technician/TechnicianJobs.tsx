@@ -16,7 +16,7 @@ import Button from "../../components/ui/Button";
 import Modal from "../../components/ui/Modal";
 import StatusBadge from "../../components/StatusBadge";
 import { formatPriority } from "../../utils/formatters";
-import { MY_JOBS_QUERY, MY_REPORTS_QUERY } from "../../graphql/queries";
+import { MY_JOBS_QUERY, MY_REPORTS_QUERY, MY_NOTIFICATIONS_QUERY } from "../../graphql/queries";
 import {
   UPDATE_JOB_STATUS_MUTATION,
   REPORT_ISSUE_MUTATION,
@@ -38,11 +38,12 @@ export default function TechnicianJobs() {
   const activeCount = myJobs.filter((j) => j.status === "PENDING" || j.status === "IN_PROGRESS").length;
 
   const [updateStatus, { loading: updating }] = useMutation(UPDATE_JOB_STATUS_MUTATION, {
-    refetchQueries: [{ query: MY_JOBS_QUERY }, { query: MY_REPORTS_QUERY, variables: { status: "PENDING" } }],
+    refetchQueries: [{ query: MY_JOBS_QUERY }, { query: MY_REPORTS_QUERY, variables: { status: "PENDING" } }, { query: MY_NOTIFICATIONS_QUERY }],
   });
+
   const [reportIssue, { loading: reportingIssue }] = useMutation(REPORT_ISSUE_MUTATION);
   const [submitReport, { loading: submittingReport }] = useMutation(SUBMIT_REPORT_MUTATION, {
-    refetchQueries: [{ query: MY_REPORTS_QUERY, variables: { status: "PENDING" } }],
+    refetchQueries: [{ query: MY_REPORTS_QUERY, variables: { status: "PENDING" } }, { query: MY_NOTIFICATIONS_QUERY }],
   });
 
   const run = async (fn: () => Promise<unknown>) => {

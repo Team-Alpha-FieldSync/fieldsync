@@ -3,7 +3,7 @@ import { useQuery, useMutation } from "@apollo/client/react";
 import { Zap, Edit, Briefcase, UserX, ChevronLeft } from "lucide-react";
 import Button from "../../components/ui/Button";
 import StatusBadge from "../../components/StatusBadge";
-import { TECHNICIANS_QUERY, JOBS_QUERY, DASHBOARD_STATS_QUERY } from "../../graphql/queries";
+import { TECHNICIANS_QUERY, JOBS_QUERY, DASHBOARD_STATS_QUERY, MY_NOTIFICATIONS_QUERY } from "../../graphql/queries";
 import {
   DEACTIVATE_TECHNICIAN_MUTATION,
   REASSIGN_JOB_MUTATION,
@@ -25,13 +25,15 @@ export default function Technicians() {
 
   const [deactivateTechnician, { loading: deactivating }] = useMutation(
     DEACTIVATE_TECHNICIAN_MUTATION,
-    { refetchQueries: [{ query: TECHNICIANS_QUERY }] }
+    { refetchQueries: [{ query: TECHNICIANS_QUERY }, { query: MY_NOTIFICATIONS_QUERY }] }
   );
+
   const [reassignJob, { loading: assigning }] = useMutation(REASSIGN_JOB_MUTATION, {
     refetchQueries: [
       { query: TECHNICIANS_QUERY },
       { query: JOBS_QUERY },
       { query: DASHBOARD_STATS_QUERY },
+      { query: MY_NOTIFICATIONS_QUERY },
     ],
   });
 

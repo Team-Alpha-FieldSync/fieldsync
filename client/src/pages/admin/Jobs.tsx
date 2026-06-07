@@ -14,7 +14,7 @@ import {
 import Button from "../../components/ui/Button";
 import StatusBadge from "../../components/StatusBadge";
 import { formatPriority } from "../../utils/formatters";
-import { JOBS_QUERY, TECHNICIANS_QUERY, DASHBOARD_STATS_QUERY } from "../../graphql/queries";
+import { JOBS_QUERY, TECHNICIANS_QUERY, DASHBOARD_STATS_QUERY, MY_NOTIFICATIONS_QUERY } from "../../graphql/queries";
 import {
   VERIFY_JOB_MUTATION,
   CANCEL_JOB_MUTATION,
@@ -42,6 +42,7 @@ export default function Jobs() {
     { query: JOBS_QUERY },
     { query: TECHNICIANS_QUERY },
     { query: DASHBOARD_STATS_QUERY },
+    { query: MY_NOTIFICATIONS_QUERY },
   ];
   const [verifyJob, { loading: verifying }] = useMutation(VERIFY_JOB_MUTATION, { refetchQueries });
   const [cancelJob, { loading: cancelling }] = useMutation(CANCEL_JOB_MUTATION, { refetchQueries });

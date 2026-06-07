@@ -3,7 +3,7 @@ import { useMutation } from "@apollo/client/react";
 import Modal from "./ui/Modal";
 import Button from "./ui/Button";
 import { CREATE_CLIENT_MUTATION } from "../graphql/mutations";
-import { CLIENTS_QUERY } from "../graphql/queries";
+import { CLIENTS_QUERY, MY_NOTIFICATIONS_QUERY } from "../graphql/queries";
 
 interface AddClientModalProps {
   isOpen: boolean;
@@ -19,7 +19,7 @@ export default function AddClientModal({ isOpen, onClose, onCreated }: AddClient
   const [createClient, { loading, error }] = useMutation<{
     createClient: { id: string; name: string };
   }>(CREATE_CLIENT_MUTATION, {
-    refetchQueries: [{ query: CLIENTS_QUERY }],
+    refetchQueries: [{ query: CLIENTS_QUERY }, { query: MY_NOTIFICATIONS_QUERY }],
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {

@@ -8,7 +8,7 @@ import {
   Phone,
   Trash2,
 } from "lucide-react";
-import { CLIENTS_QUERY } from "../../graphql/queries";
+import { CLIENTS_QUERY, MY_NOTIFICATIONS_QUERY } from "../../graphql/queries";
 import { DELETE_CLIENT_MUTATION } from "../../graphql/mutations";
 import { mapClient, type ClientNode } from "../../adapters/client";
 import EditClientModal from "../../components/EditClientModal";
@@ -23,7 +23,7 @@ export default function Clients() {
   const selectedClient = clients.find((c) => c.rawId === selectedId) ?? null;
 
   const [deleteClient, { loading: isDeleting }] = useMutation(DELETE_CLIENT_MUTATION, {
-    refetchQueries: [{ query: CLIENTS_QUERY }],
+    refetchQueries: [{ query: CLIENTS_QUERY }, { query: MY_NOTIFICATIONS_QUERY }],
   });
 
   const selectClient = (rawId: string | null) => {

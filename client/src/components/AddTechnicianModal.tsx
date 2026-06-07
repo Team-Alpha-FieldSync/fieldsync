@@ -3,7 +3,7 @@ import { useMutation } from "@apollo/client/react";
 import Modal from "./ui/Modal";
 import Button from "./ui/Button";
 import { CREATE_TECHNICIAN_MUTATION } from "../graphql/mutations";
-import { TECHNICIANS_QUERY } from "../graphql/queries";
+import { TECHNICIANS_QUERY, MY_NOTIFICATIONS_QUERY } from "../graphql/queries";
 import { JOB_CATEGORY } from "../utils/constants";
 
 interface AddTechnicianModalProps {
@@ -31,7 +31,7 @@ export default function AddTechnicianModal({ isOpen, onClose }: AddTechnicianMod
   const [form, setForm] = useState(INITIAL_FORM);
 
   const [createTechnician, { loading, error }] = useMutation(CREATE_TECHNICIAN_MUTATION, {
-    refetchQueries: [{ query: TECHNICIANS_QUERY }],
+    refetchQueries: [{ query: TECHNICIANS_QUERY }, { query: MY_NOTIFICATIONS_QUERY }],
   });
 
   const handleChange = (

@@ -3,7 +3,7 @@ import { useMutation } from "@apollo/client/react";
 import Modal from "./ui/Modal";
 import Button from "./ui/Button";
 import { UPDATE_CLIENT_MUTATION } from "../graphql/mutations";
-import { CLIENTS_QUERY } from "../graphql/queries";
+import { CLIENTS_QUERY, MY_NOTIFICATIONS_QUERY } from "../graphql/queries";
 import type { ClientView } from "../adapters/client";
 
 interface EditClientModalProps {
@@ -20,13 +20,13 @@ export default function EditClientModal({ isOpen, onClose, client }: EditClientM
       setForm({
         name: client.name,
         email: client.email,
-        phone: client.phone === "—" ? "" : client.phone,
+        phone: client.phone === "ï¿½" ? "" : client.phone,
       });
     }
   }, [client]);
 
   const [updateClient, { loading, error }] = useMutation(UPDATE_CLIENT_MUTATION, {
-    refetchQueries: [{ query: CLIENTS_QUERY }],
+    refetchQueries: [{ query: CLIENTS_QUERY }, { query: MY_NOTIFICATIONS_QUERY }],
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -99,7 +99,7 @@ export default function EditClientModal({ isOpen, onClose, client }: EditClientM
             Cancel
           </Button>
           <Button type="submit" variant="primary" disabled={loading}>
-            {loading ? "Saving…" : "Save Changes"}
+            {loading ? "Savingï¿½" : "Save Changes"}
           </Button>
         </div>
       </form>

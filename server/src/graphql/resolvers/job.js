@@ -19,6 +19,15 @@ import {
   notifyJobUpdated,
   notifyJobDeleted,
 } from "../../services/notificationService.js";
+import {
+  emailClientJobAssigned,
+  emailClientJobReassigned,
+  emailClientJobStarted,
+  emailClientJobCompleted,
+  emailClientJobVerified,
+  emailClientJobCancelled,
+  emailClientJobUpdated,
+} from "../../services/clientEmailService.js";
 
 const TECHNICIAN_STATUS_TRANSITIONS = {
   [JOB_STATUS.PENDING]: [JOB_STATUS.IN_PROGRESS],
@@ -117,6 +126,7 @@ export default {
 
       await syncTechnicianAvailability(input.technicianId);
       await notifyJobAssigned(job);
+      await emailClientJobAssigned(job);
 
       return job;
     },
@@ -134,6 +144,17 @@ export default {
           extensions: { code: "BAD_USER_INPUT" },
         });
       }
+      const importantUpdates = [];
+      if(input.location != null && input.location !== job.location) {
+        importantUpdates.push("The service location was updated.");
+      }
+      if(input.deadline != null) {
+        const currentDeadline = job.deadline ? new Date(job.deadline).getTime() : null;
+        const nextDeadline = new Date(input.deadline).getTime();
+        if(currentDeadline !== nextDeadline) {
+          importantUpdates.push("The expected completion date was updated.");
+        }
+      }
       if(input.title != null) job.title = input.title;
       if(input.description != null) job.description = input.description;
       if(input.location != null) job.location = input.location;
@@ -141,6 +162,9 @@ export default {
       if(input.deadline != null) job.deadline = input.deadline;
       await job.save();
       await notifyJobUpdated(job, "details were edited");
+      if(importantUpdates.length > 0) {
+        await emailClientJobUpdated(job, importantUpdates.join(" "));
+      }
       return job;
     },
 
@@ -185,6 +209,7 @@ export default {
       await syncTechnicianAvailability(technicianId);
       await notifyJobReassignedAway(job, previousTechnicianId);
       await notifyJobAssigned(job);
+      await emailClientJobReassigned(job);
       return job;
     },
 
@@ -206,6 +231,7 @@ export default {
       await job.save();
       await syncTechnicianAvailability(technicianId);
       await notifyJobCancelled(job);
+      await emailClientJobCancelled(job);
       return job;
     },
 
@@ -278,6 +304,7 @@ export default {
           JOB_STATUS.IN_PROGRESS,
           technician?.name,
         );
+        await emailClientJobStarted(job);
       }
 
       //When a job is completed, open a pending field report for the technician
@@ -296,6 +323,7 @@ export default {
         }
         await syncTechnicianAvailability(job.technician);
         await notifyJobCompleted(job, technician?.name);
+        await emailClientJobCompleted(job);
       }
 
       return job;
@@ -320,6 +348,7 @@ export default {
       job.status = JOB_STATUS.VERIFIED;
       await job.save();
       await notifyJobVerified(job);
+      await emailClientJobVerified(job);
 
       return job;
     },

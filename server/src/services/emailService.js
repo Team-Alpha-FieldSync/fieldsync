@@ -64,7 +64,7 @@ const toPlainText = (html) =>
         .trim();
 
 /**
- * Pre-built templates for the three notification types.
+ * Pre-built templates.
  * Each returns { subject, html }.
  */
 const templates = {
@@ -94,13 +94,122 @@ const templates = {
             <p>${message}</p>
         `,
     }),
+
+    client_created: ({ clientName }) => ({
+        subject: 'Welcome to FieldSync',
+        html: `
+            <p>Hi ${clientName},</p>
+            <p>Your details have been added to the FieldSync service database.</p>
+            <p>Our team has received your request, and your job will be taken up soon.</p>
+            <p>Thank you for choosing FieldSync.</p>
+        `,
+    }),
+
+    client_deleted: ({ clientName }) => ({
+        subject: 'Thank you for using FieldSync',
+        html: `
+            <p>Hi ${clientName},</p>
+            <p>Your client record has been removed from the FieldSync service database.</p>
+            <p>Thank you for using our service. We hope to serve you again soon.</p>
+        `,
+    }),
+
+    client_job_assigned: ({
+        clientName,
+        jobCode,
+        jobTitle,
+        jobLocation,
+        technicianName,
+        assignedAt,
+        deadline,
+    }) => ({
+        subject: `Technician assigned for ${jobCode}`,
+        html: `
+            <p>Hi ${clientName},</p>
+            <p>Your job <strong>${jobCode}: ${jobTitle}</strong> has been assigned to <strong>${technicianName}</strong>.</p>
+            <p><strong>Location:</strong> ${jobLocation}<br/>
+            <strong>Assigned at:</strong> ${assignedAt}<br/>
+            <strong>Expected completion:</strong> ${deadline}</p>
+            <p>FieldSync will keep you updated as work progresses.</p>
+        `,
+    }),
+
+    client_job_reassigned: ({
+        clientName,
+        jobCode,
+        jobTitle,
+        jobLocation,
+        technicianName,
+        assignedAt,
+        deadline,
+    }) => ({
+        subject: `Technician reassigned for ${jobCode}`,
+        html: `
+            <p>Hi ${clientName},</p>
+            <p>Your job <strong>${jobCode}: ${jobTitle}</strong> has been reassigned to <strong>${technicianName}</strong>.</p>
+            <p><strong>Location:</strong> ${jobLocation}<br/>
+            <strong>Reassigned at:</strong> ${assignedAt}<br/>
+            <strong>Expected completion:</strong> ${deadline}</p>
+            <p>FieldSync will keep you updated as work progresses.</p>
+        `,
+    }),
+
+    client_job_started: ({ clientName, jobCode, jobTitle, technicianName, startedAt }) => ({
+        subject: `Work started on ${jobCode}`,
+        html: `
+            <p>Hi ${clientName},</p>
+            <p><strong>${technicianName}</strong> has started work on <strong>${jobCode}: ${jobTitle}</strong>.</p>
+            <p><strong>Started at:</strong> ${startedAt}</p>
+            <p>We will let you know when the work is completed.</p>
+        `,
+    }),
+
+    client_job_completed: ({ clientName, jobCode, jobTitle, technicianName, completedAt }) => ({
+        subject: `Work completed for ${jobCode}`,
+        html: `
+            <p>Hi ${clientName},</p>
+            <p><strong>${technicianName}</strong> has marked <strong>${jobCode}: ${jobTitle}</strong> as completed.</p>
+            <p><strong>Completed at:</strong> ${completedAt}</p>
+            <p>The work is now being verified by FieldSync.</p>
+        `,
+    }),
+
+    client_job_verified: ({ clientName, jobCode, jobTitle, verifiedAt }) => ({
+        subject: `${jobCode} has been verified`,
+        html: `
+            <p>Hi ${clientName},</p>
+            <p><strong>${jobCode}: ${jobTitle}</strong> has been verified and closed.</p>
+            <p><strong>Verified at:</strong> ${verifiedAt}</p>
+            <p>Thank you again for using FieldSync.</p>
+        `,
+    }),
+
+    client_job_cancelled: ({ clientName, jobCode, jobTitle, supportContact }) => ({
+        subject: `${jobCode} has been cancelled`,
+        html: `
+            <p>Hi ${clientName},</p>
+            <p>Your job <strong>${jobCode}: ${jobTitle}</strong> has been cancelled.</p>
+            <p>Please contact FieldSync customer support for more information${supportContact ? `: ${supportContact}` : '.'}</p>
+        `,
+    }),
+
+    client_job_updated: ({ clientName, jobCode, jobTitle, updateSummary, jobLocation, deadline }) => ({
+        subject: `${jobCode} details updated`,
+        html: `
+            <p>Hi ${clientName},</p>
+            <p>Important details for <strong>${jobCode}: ${jobTitle}</strong> have been updated.</p>
+            <p>${updateSummary}</p>
+            <p><strong>Location:</strong> ${jobLocation}<br/>
+            <strong>Expected completion:</strong> ${deadline}</p>
+        `,
+    }),
 };
 
 /**
  * Send an email using a named template.
  *
  * @param {string} to - Recipient email address
- * @param {string} templateName - One of: 'job_assigned', 'status_updated', 'system_alert'
+ * @param {string} templateName - Name of a template in the template dictionary
  * @param {object} data - Template-specific data
  * @returns {Promise<boolean>} true if sent (or logged in dev), false on failure
  */

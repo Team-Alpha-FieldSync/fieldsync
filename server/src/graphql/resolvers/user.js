@@ -13,6 +13,10 @@ import {
     notifyTechnicianReactivated,
     notifyTechnicianDeleted,
 } from "../../services/notificationService.js";
+import {
+    emailClientCreated,
+    emailClientDeleted,
+} from "../../services/clientEmailService.js";
 
 export default{
     Query: {
@@ -153,6 +157,7 @@ export default{
                 createdBy: user.userId,
             });
             await notifyClientCreated(user.userId, client);
+            await emailClientCreated(client);
             return client;
         },
 
@@ -202,6 +207,7 @@ export default{
                 );
             }
 
+            await emailClientDeleted(client);
             await client.deleteOne();
             await notifyClientDeleted(user.userId, client);
             return client;

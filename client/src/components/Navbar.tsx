@@ -30,7 +30,7 @@ export default function AdminNavbar({
 
   const { data: notificationsData } = useQuery<{
     myNotifications: { read: boolean }[];
-  }>(MY_NOTIFICATIONS_QUERY);
+  }>(MY_NOTIFICATIONS_QUERY, { pollInterval: 30_000 });
   const unreadCount =
     notificationsData?.myNotifications?.filter((n) => !n.read).length ?? 0;
 

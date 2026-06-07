@@ -1,4 +1,4 @@
-import { graphql, GraphQLError } from "graphql";
+import { GraphQLError } from "graphql";
 import Job from "../../models/Job.js";
 import User from "../../models/User.js";
 import Report from "../../models/Report.js";
@@ -9,8 +9,15 @@ import {
   requireAdmin,
   requireTechnician,
 } from "../../guards/roles.js";
-//Uncomment when notificationService exists
-//import {notify} from '../../services/notificationService.js';
+import {
+  notifyJobAssigned,
+  notifyJobReassignedAway,
+  notifyJobStatusChanged,
+  notifyJobCompleted,
+  notifyJobVerified,
+  notifyJobCancelled,
+  notifyJobUpdated,
+} from "../../services/notificationService.js";
 
 const TECHNICIAN_STATUS_TRANSITIONS = {
   [JOB_STATUS.PENDING]: [JOB_STATUS.IN_PROGRESS],
@@ -108,9 +115,7 @@ export default {
       });
 
       await syncTechnicianAvailability(input.technicianId);
-
-      //TODO (notification ticket): trigger an "assigned" notification
-      //await notify(client._id, job._id, 'assigned', '...');
+      await notifyJobAssigned(job);
 
       return job;
     },
@@ -134,6 +139,7 @@ export default {
       if(input.category != null) job.category = input.category;
       if(input.deadline != null) job.deadline = input.deadline;
       await job.save();
+      await notifyJobUpdated(job, "details were edited");
       return job;
     },
 
@@ -152,6 +158,7 @@ export default {
       }
       job.priority = priority;
       await job.save();
+      await notifyJobUpdated(job, `priority set to ${priority}`);
       return job;
     },
 
@@ -175,6 +182,8 @@ export default {
       await job.save();
       await syncTechnicianAvailability(previousTechnicianId);
       await syncTechnicianAvailability(technicianId);
+      await notifyJobReassignedAway(job, previousTechnicianId);
+      await notifyJobAssigned(job);
       return job;
     },
 
@@ -195,6 +204,7 @@ export default {
       job.status = JOB_STATUS.CANCELLED;
       await job.save();
       await syncTechnicianAvailability(technicianId);
+      await notifyJobCancelled(job);
       return job;
     },
 
@@ -258,6 +268,16 @@ export default {
       job.status = newStatus;
       await job.save();
 
+      const technician = await User.findById(user.userId);
+
+      if (newStatus === JOB_STATUS.IN_PROGRESS) {
+        await notifyJobStatusChanged(
+          job,
+          JOB_STATUS.IN_PROGRESS,
+          technician?.name,
+        );
+      }
+
       //When a job is completed, open a pending field report for the technician
       //(so it surfaces under "Pending Reports" until they submit it)
       if (newStatus === JOB_STATUS.COMPLETED) {
@@ -273,9 +293,8 @@ export default {
           });
         }
         await syncTechnicianAvailability(job.technician);
+        await notifyJobCompleted(job, technician?.name);
       }
-
-      //TODO (notification ticket): trigger a status_changed notification
 
       return job;
     },
@@ -298,6 +317,7 @@ export default {
 
       job.status = JOB_STATUS.VERIFIED;
       await job.save();
+      await notifyJobVerified(job);
 
       return job;
     },

@@ -3,7 +3,8 @@ import Job from "../../models/Job.js";
 import User from '../../models/User.js'
 import Notification from '../../models/Notification.js';
 import {requireAuth, requireTechnician} from '../../guards/roles.js';
-import {ROLES, NOTIFICATION_TYPE} from '../../utils/constants.js';
+import {ROLES} from '../../utils/constants.js';
+import { notifySystemAlert } from '../../services/notificationService.js';
 
 export default {
     Query: {
@@ -68,13 +69,7 @@ export default {
                 });
             }
 
-            //Notify the admin who created the job
-            return Notification.create({
-                user: job.createdBy,
-                job: jobId,
-                type: NOTIFICATION_TYPE.SYSTEM_ALERT,
-                message,
-            });
+            return notifySystemAlert(job.createdBy, jobId, message);
         },
     },
 

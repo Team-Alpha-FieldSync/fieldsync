@@ -6,8 +6,10 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node src/index.js",
-    "clear-db" : "node src/scripts/clearDatabase.js",
-    "update-admin" : "node src/scripts/updateAdmin.js"
+    "clear-db": "node src/scripts/clearDatabase.js",
+    "admin": "node src/scripts/updateAdmin.js",
+    "admin:update": "node src/scripts/updateAdmin.js update",
+    "admin:create": "node src/scripts/updateAdmin.js create"
   },
   "keywords": [],
   "author": "",

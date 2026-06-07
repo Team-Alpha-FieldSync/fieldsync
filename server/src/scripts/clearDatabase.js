@@ -12,7 +12,7 @@
  *   - Existing admin accounts are preserved.
  *   - Run from `fieldsync/server` or via npm script.
  * 
-* Easy access: npm clear-db (instead of node src/scripts/clearDatabase.js)
+* Easy access: npm run clear-db (instead of node src/scripts/clearDatabase.js)
  */
 
 import 'dotenv/config';

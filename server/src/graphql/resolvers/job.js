@@ -1,15 +1,33 @@
-import { graphql, GraphQLError } from "graphql";
+import { GraphQLError } from "graphql";
 import Job from "../../models/Job.js";
 import User from "../../models/User.js";
 import Report from "../../models/Report.js";
 import { ROLES, JOB_STATUS, REPORT_STATUS } from "../../utils/constants.js";
+import { syncTechnicianAvailability } from "../../utils/syncTechnicianAvailability.js";
 import {
   requireAuth,
   requireAdmin,
   requireTechnician,
 } from "../../guards/roles.js";
-//Uncomment when notificationService exists
-//import {notify} from '../../services/notificationService.js';
+import {
+  notifyJobAssigned,
+  notifyJobReassignedAway,
+  notifyJobStatusChanged,
+  notifyJobCompleted,
+  notifyJobVerified,
+  notifyJobCancelled,
+  notifyJobUpdated,
+  notifyJobDeleted,
+} from "../../services/notificationService.js";
+import {
+  emailClientJobAssigned,
+  emailClientJobReassigned,
+  emailClientJobStarted,
+  emailClientJobCompleted,
+  emailClientJobVerified,
+  emailClientJobCancelled,
+  emailClientJobUpdated,
+} from "../../services/clientEmailService.js";
 
 const TECHNICIAN_STATUS_TRANSITIONS = {
   [JOB_STATUS.PENDING]: [JOB_STATUS.IN_PROGRESS],
@@ -106,8 +124,9 @@ export default {
         status: JOB_STATUS.PENDING,
       });
 
-      //TODO (notification ticket): trigger an "assigned" notification
-      //await notify(client._id, job._id, 'assigned', '...');
+      await syncTechnicianAvailability(input.technicianId);
+      await notifyJobAssigned(job);
+      await emailClientJobAssigned(job);
 
       return job;
     },
@@ -125,12 +144,27 @@ export default {
           extensions: { code: "BAD_USER_INPUT" },
         });
       }
+      const importantUpdates = [];
+      if(input.location != null && input.location !== job.location) {
+        importantUpdates.push("The service location was updated.");
+      }
+      if(input.deadline != null) {
+        const currentDeadline = job.deadline ? new Date(job.deadline).getTime() : null;
+        const nextDeadline = new Date(input.deadline).getTime();
+        if(currentDeadline !== nextDeadline) {
+          importantUpdates.push("The expected completion date was updated.");
+        }
+      }
       if(input.title != null) job.title = input.title;
       if(input.description != null) job.description = input.description;
       if(input.location != null) job.location = input.location;
       if(input.category != null) job.category = input.category;
       if(input.deadline != null) job.deadline = input.deadline;
       await job.save();
+      await notifyJobUpdated(job, "details were edited");
+      if(importantUpdates.length > 0) {
+        await emailClientJobUpdated(job, importantUpdates.join(" "));
+      }
       return job;
     },
 
@@ -149,6 +183,7 @@ export default {
       }
       job.priority = priority;
       await job.save();
+      await notifyJobUpdated(job, `priority set to ${priority}`);
       return job;
     },
 
@@ -167,8 +202,14 @@ export default {
       }
       const technician = await User.findById(technicianId);
       assertAssignableTechnician(technician);
+      const previousTechnicianId = job.technician?.toString();
       job.technician = technicianId;
       await job.save();
+      await syncTechnicianAvailability(previousTechnicianId);
+      await syncTechnicianAvailability(technicianId);
+      await notifyJobReassignedAway(job, previousTechnicianId);
+      await notifyJobAssigned(job);
+      await emailClientJobReassigned(job);
       return job;
     },
 
@@ -185,8 +226,12 @@ export default {
           extensions: { code: "BAD_USER_INPUT" },
         });
       }
+      const technicianId = job.technician?.toString();
       job.status = JOB_STATUS.CANCELLED;
       await job.save();
+      await syncTechnicianAvailability(technicianId);
+      await notifyJobCancelled(job);
+      await emailClientJobCancelled(job);
       return job;
     },
 
@@ -204,6 +249,7 @@ export default {
         });
       }
       await job.deleteOne();
+      await notifyJobDeleted(user.userId, job);
       return job;
     },
 
@@ -250,6 +296,17 @@ export default {
       job.status = newStatus;
       await job.save();
 
+      const technician = await User.findById(user.userId);
+
+      if (newStatus === JOB_STATUS.IN_PROGRESS) {
+        await notifyJobStatusChanged(
+          job,
+          JOB_STATUS.IN_PROGRESS,
+          technician?.name,
+        );
+        await emailClientJobStarted(job);
+      }
+
       //When a job is completed, open a pending field report for the technician
       //(so it surfaces under "Pending Reports" until they submit it)
       if (newStatus === JOB_STATUS.COMPLETED) {
@@ -264,9 +321,10 @@ export default {
             status: REPORT_STATUS.PENDING,
           });
         }
+        await syncTechnicianAvailability(job.technician);
+        await notifyJobCompleted(job, technician?.name);
+        await emailClientJobCompleted(job);
       }
-
-      //TODO (notification ticket): trigger a status_changed notification
 
       return job;
     },
@@ -289,6 +347,8 @@ export default {
 
       job.status = JOB_STATUS.VERIFIED;
       await job.save();
+      await notifyJobVerified(job);
+      await emailClientJobVerified(job);
 
       return job;
     },

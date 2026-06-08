@@ -1,11 +1,13 @@
 import { useState } from "react";
 import { useQuery, useMutation } from "@apollo/client/react";
-import { Zap, Edit, Briefcase, UserX, ChevronLeft } from "lucide-react";
+import { Zap, Edit, Briefcase, UserX, UserCheck, Trash2, ChevronLeft } from "lucide-react";
 import Button from "../../components/ui/Button";
 import StatusBadge from "../../components/StatusBadge";
-import { TECHNICIANS_QUERY, JOBS_QUERY } from "../../graphql/queries";
+import { TECHNICIANS_QUERY, JOBS_QUERY, DASHBOARD_STATS_QUERY, MY_NOTIFICATIONS_QUERY } from "../../graphql/queries";
 import {
   DEACTIVATE_TECHNICIAN_MUTATION,
+  REACTIVATE_TECHNICIAN_MUTATION,
+  DELETE_TECHNICIAN_MUTATION,
   REASSIGN_JOB_MUTATION,
 } from "../../graphql/mutations";
 import { mapTechnician, type TechNode } from "../../adapters/technician";
@@ -23,12 +25,29 @@ export default function Technicians() {
   const selectedTech = technicians.find((t) => t.rawId === selectedId) ?? null;
   const pendingJobs = (jobsData?.jobs ?? []).filter((j) => j.status === "PENDING");
 
+  const techRefetch = {
+    refetchQueries: [{ query: TECHNICIANS_QUERY }, { query: MY_NOTIFICATIONS_QUERY }],
+  };
   const [deactivateTechnician, { loading: deactivating }] = useMutation(
     DEACTIVATE_TECHNICIAN_MUTATION,
-    { refetchQueries: [{ query: TECHNICIANS_QUERY }] }
+    techRefetch,
   );
+  const [reactivateTechnician, { loading: reactivating }] = useMutation(
+    REACTIVATE_TECHNICIAN_MUTATION,
+    techRefetch,
+  );
+  const [deleteTechnician, { loading: deleting }] = useMutation(
+    DELETE_TECHNICIAN_MUTATION,
+    techRefetch,
+  );
+
   const [reassignJob, { loading: assigning }] = useMutation(REASSIGN_JOB_MUTATION, {
-    refetchQueries: [{ query: TECHNICIANS_QUERY }, { query: JOBS_QUERY }],
+    refetchQueries: [
+      { query: TECHNICIANS_QUERY },
+      { query: JOBS_QUERY },
+      { query: DASHBOARD_STATS_QUERY },
+      { query: MY_NOTIFICATIONS_QUERY },
+    ],
   });
 
   const run = async (fn: () => Promise<unknown>) => {
@@ -247,22 +266,58 @@ export default function Technicians() {
                   <Briefcase size={20} className="sm:mb-1 shrink-0" />
                   <span className="text-xs font-medium">Job History</span>
                 </button>
-                <button
-                  onClick={() => run(() => deactivateTechnician({ variables: { id: selectedTech.rawId } }))}
-                  disabled={!selectedTech.isActive || deactivating || !!selectedTech.assignment}
-                  title={
-                    selectedTech.assignment
-                      ? "Reassign or complete active jobs before deactivating"
-                      : undefined
-                  }
-                  className="flex sm:flex-col items-center justify-center gap-3 sm:gap-2 p-3 sm:p-4 border border-border-muted rounded-lg hover:text-danger hover:border-danger transition-colors text-fg-muted bg-danger/5 sm:bg-transparent disabled:opacity-50 disabled:hover:text-fg-muted disabled:hover:border-border-muted"
-                >
-                  <UserX size={20} className="sm:mb-1 shrink-0" />
-                  <span className="text-xs font-medium text-center leading-tight">
-                    {selectedTech.isActive ? <>Deactivate <span className="sm:hidden">Account</span></> : "Deactivated"}
-                  </span>
-                </button>
+                {selectedTech.isActive ? (
+                  <button
+                    onClick={() => run(() => deactivateTechnician({ variables: { id: selectedTech.rawId } }))}
+                    disabled={deactivating || !!selectedTech.assignment}
+                    title={
+                      selectedTech.assignment
+                        ? "Reassign or complete active jobs before deactivating"
+                        : undefined
+                    }
+                    className="flex sm:flex-col items-center justify-center gap-3 sm:gap-2 p-3 sm:p-4 border border-border-muted rounded-lg hover:text-danger hover:border-danger transition-colors text-fg-muted bg-danger/5 sm:bg-transparent disabled:opacity-50 disabled:hover:text-fg-muted disabled:hover:border-border-muted"
+                  >
+                    <UserX size={20} className="sm:mb-1 shrink-0" />
+                    <span className="text-xs font-medium text-center leading-tight">
+                      Deactivate <span className="sm:hidden">Account</span>
+                    </span>
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => run(() => reactivateTechnician({ variables: { id: selectedTech.rawId } }))}
+                    disabled={reactivating}
+                    className="flex sm:flex-col items-center justify-center gap-3 sm:gap-2 p-3 sm:p-4 border border-border-muted rounded-lg hover:text-success hover:border-success transition-colors text-fg-muted bg-success/5 sm:bg-transparent disabled:opacity-50 disabled:hover:text-fg-muted disabled:hover:border-border-muted"
+                  >
+                    <UserCheck size={20} className="sm:mb-1 shrink-0" />
+                    <span className="text-xs font-medium text-center leading-tight">
+                      {reactivating ? "Reactivating…" : <>Reactivate <span className="sm:hidden">Account</span></>}
+                    </span>
+                  </button>
+                )}
               </div>
+
+              {/* Permanently delete */}
+              <button
+                onClick={() => {
+                  if (!window.confirm(`Permanently delete ${selectedTech.name}? This cannot be undone.`)) return;
+                  run(async () => {
+                    await deleteTechnician({ variables: { id: selectedTech.rawId } });
+                    setSelectedId(null);
+                  });
+                }}
+                disabled={deleting || !!selectedTech.assignment}
+                title={
+                  selectedTech.assignment
+                    ? "Reassign or complete active jobs before deleting"
+                    : undefined
+                }
+                className="w-full flex items-center justify-center gap-2 py-2.5 border border-danger/30 rounded-lg text-danger hover:bg-danger/10 transition-colors disabled:opacity-50 disabled:hover:bg-transparent"
+              >
+                <Trash2 size={16} />
+                <span className="text-sm font-medium">
+                  {deleting ? "Deleting…" : "Delete Account"}
+                </span>
+              </button>
             </div>
           </div>
         )}

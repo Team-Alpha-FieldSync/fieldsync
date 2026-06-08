@@ -4,6 +4,19 @@ import { AVAILABILITY, ROLES, JOB_STATUS } from "../../utils/constants.js";
 import { GraphQLError } from "graphql";
 import { hashPassword } from "../../utils/hashPassword.js";
 import { requireAdmin, requireAuth } from "../../guards/roles.js";
+import {
+    notifyClientCreated,
+    notifyTechnicianCreated,
+    notifyClientUpdated,
+    notifyClientDeleted,
+    notifyTechnicianDeactivated,
+    notifyTechnicianReactivated,
+    notifyTechnicianDeleted,
+} from "../../services/notificationService.js";
+import {
+    emailClientCreated,
+    emailClientDeleted,
+} from "../../services/clientEmailService.js";
 
 export default{
     Query: {
@@ -46,13 +59,15 @@ export default{
                 });
             }
 
-            return User.create({
+            const technician = await User.create({
                 ...input,
                 password: await hashPassword(input.password),
                 role: ROLES.TECHNICIAN,
                 availability: AVAILABILITY.AVAILABLE,
                 createdBy: user.userId,
             });
+            await notifyTechnicianCreated(user.userId, technician);
+            return technician;
         },
 
         deactivateTechnician: async (_, {id}, {user}) => {
@@ -77,6 +92,51 @@ export default{
 
             technician.isActive = false;
             await technician.save();
+            await notifyTechnicianDeactivated(user.userId, technician);
+            return technician;
+        },
+
+        reactivateTechnician: async (_, {id}, {user}) => {
+            requireAdmin(user);
+            const technician = await User.findById(id);
+            if (!technician || technician.role !== ROLES.TECHNICIAN) {
+                throw new GraphQLError("Invalid technician", {
+                    extensions: { code: "BAD_USER_INPUT" },
+                });
+            }
+            if (technician.isActive !== false) {
+                throw new GraphQLError("Technician is already active", {
+                    extensions: { code: "BAD_USER_INPUT" },
+                });
+            }
+            technician.isActive = true;
+            await technician.save();
+            await notifyTechnicianReactivated(user.userId, technician);
+            return technician;
+        },
+
+        deleteTechnician: async (_, {id}, {user}) => {
+            requireAdmin(user);
+            const technician = await User.findById(id);
+            if (!technician || technician.role !== ROLES.TECHNICIAN) {
+                throw new GraphQLError("Invalid technician", {
+                    extensions: { code: "BAD_USER_INPUT" },
+                });
+            }
+
+            const activeJobCount = await Job.countDocuments({
+                technician: id,
+                status: { $in: [JOB_STATUS.PENDING, JOB_STATUS.IN_PROGRESS] },
+            });
+            if (activeJobCount > 0) {
+                throw new GraphQLError(
+                    `Cannot delete: technician has ${activeJobCount} active job(s). Reassign or complete them first.`,
+                    { extensions: { code: "BAD_USER_INPUT" } },
+                );
+            }
+
+            await technician.deleteOne();
+            await notifyTechnicianDeleted(user.userId, technician);
             return technician;
         },
 
@@ -91,11 +151,66 @@ export default{
             }
         
             //No password - Clients don't authenticate
-            return User.create({
+            const client = await User.create({
                 ...input,
                 role: ROLES.CLIENT,
                 createdBy: user.userId,
             });
+            await notifyClientCreated(user.userId, client);
+            await emailClientCreated(client);
+            return client;
+        },
+
+        updateClient: async (_, { id, input }, { user }) => {
+            requireAdmin(user);
+
+            const client = await User.findById(id);
+            if (!client || client.role !== ROLES.CLIENT) {
+                throw new GraphQLError("Invalid client", {
+                    extensions: { code: "BAD_USER_INPUT" },
+                });
+            }
+
+            if (input.email != null) {
+                const email = input.email.toLowerCase();
+                const existing = await User.findOne({ email, _id: { $ne: id } });
+                if (existing) {
+                    throw new GraphQLError("A user with that email already exists", {
+                        extensions: { code: "BAD_USER_INPUT" },
+                    });
+                }
+                client.email = email;
+            }
+            if (input.name != null) client.name = input.name;
+            if (input.phone != null) client.phone = input.phone;
+
+            await client.save();
+            await notifyClientUpdated(user.userId, client);
+            return client;
+        },
+
+        deleteClient: async (_, { id }, { user }) => {
+            requireAdmin(user);
+
+            const client = await User.findById(id);
+            if (!client || client.role !== ROLES.CLIENT) {
+                throw new GraphQLError("Invalid client", {
+                    extensions: { code: "BAD_USER_INPUT" },
+                });
+            }
+
+            const jobCount = await Job.countDocuments({ client: id });
+            if (jobCount > 0) {
+                throw new GraphQLError(
+                    `Cannot delete: client has ${jobCount} associated job(s). Remove or reassign jobs first.`,
+                    { extensions: { code: "BAD_USER_INPUT" } },
+                );
+            }
+
+            await emailClientDeleted(client);
+            await client.deleteOne();
+            await notifyClientDeleted(user.userId, client);
+            return client;
         },
 
     },
@@ -109,6 +224,8 @@ export default{
         },
         techCode: (parent) => 
             parent.techNumber != null ? `TCH ${1000 + parent.techNumber}` : null,
+        clientCode: (parent) =>
+            parent.clientNumber != null ? `CLI ${1000 + parent.clientNumber}` : null,
         currentJob: async (parent) => {
             if(parent.role !== ROLES.TECHNICIAN) return null;
             return Job.findOne({

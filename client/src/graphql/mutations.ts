@@ -40,8 +40,30 @@ export const CREATE_CLIENT_MUTATION = gql`
       name
       email
       phone
+      clientCode
       role
       createdAt
+    }
+  }
+`;
+
+export const UPDATE_CLIENT_MUTATION = gql`
+  mutation UpdateClient($id: ID!, $input: UpdateClientInput!) {
+    updateClient(id: $id, input: $input) {
+      id
+      name
+      email
+      phone
+      clientCode
+      updatedAt
+    }
+  }
+`;
+
+export const DELETE_CLIENT_MUTATION = gql`
+  mutation DeleteClient($id: ID!) {
+    deleteClient(id: $id) {
+      id
     }
   }
 `;
@@ -137,6 +159,23 @@ export const DEACTIVATE_TECHNICIAN_MUTATION = gql`
   }
 `;
 
+export const REACTIVATE_TECHNICIAN_MUTATION = gql`
+  mutation ReactivateTechnician($id: ID!) {
+    reactivateTechnician(id: $id) {
+      id
+      isActive
+    }
+  }
+`;
+
+export const DELETE_TECHNICIAN_MUTATION = gql`
+  mutation DeleteTechnician($id: ID!) {
+    deleteTechnician(id: $id) {
+      id
+    }
+  }
+`;
+
 export const VERIFY_JOB_MUTATION = gql`
   mutation VerifyJob($id: ID!) {
     verifyJob(id: $id) {
@@ -152,6 +191,15 @@ export const VERIFY_JOB_MUTATION = gql`
 export const MARK_NOTIFICATION_READ_MUTATION = gql`
   mutation MarkNotificationRead($id: ID!) {
     markNotificationRead(id: $id) {
+      id
+      read
+    }
+  }
+`;
+
+export const MARK_ALL_NOTIFICATIONS_READ_MUTATION = gql`
+  mutation MarkAllNotificationsRead {
+    markAllNotificationsRead {
       id
       read
     }

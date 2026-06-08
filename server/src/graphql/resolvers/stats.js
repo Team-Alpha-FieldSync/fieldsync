@@ -15,6 +15,7 @@ export default {
           Job.countDocuments({ status: JOB_STATUS.COMPLETED }),
           User.countDocuments({
             role: ROLES.TECHNICIAN,
+            isActive: { $ne: false },
             availability: AVAILABILITY.AVAILABLE,
           }),
         ]);

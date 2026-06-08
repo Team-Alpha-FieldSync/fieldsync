@@ -8,6 +8,7 @@ import {
   TECHNICIANS_QUERY,
   JOBS_QUERY,
   DASHBOARD_STATS_QUERY,
+  MY_NOTIFICATIONS_QUERY,
 } from "../graphql/queries";
 import { CREATE_JOB_MUTATION } from "../graphql/mutations";
 import { JOB_PRIORITY, JOB_CATEGORY } from "../utils/constants";
@@ -61,7 +62,9 @@ export default function AddJobModal({ isOpen, onClose }: AddJobModalProps) {
   const [createJob, { loading, error }] = useMutation(CREATE_JOB_MUTATION, {
     refetchQueries: [
       { query: JOBS_QUERY },
+      { query: TECHNICIANS_QUERY },
       { query: DASHBOARD_STATS_QUERY },
+      { query: MY_NOTIFICATIONS_QUERY },
     ],
   });
 

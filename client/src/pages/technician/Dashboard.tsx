@@ -13,7 +13,7 @@ import StatusBadge from "../../components/StatusBadge";
 import Modal from "../../components/ui/Modal";
 import Button from "../../components/ui/Button";
 import { formatPriority } from "../../utils/formatters";
-import { MY_JOBS_QUERY, MY_REPORTS_QUERY } from "../../graphql/queries";
+import { MY_JOBS_QUERY, MY_REPORTS_QUERY, MY_NOTIFICATIONS_QUERY } from "../../graphql/queries";
 import { UPDATE_JOB_STATUS_MUTATION, SUBMIT_REPORT_MUTATION } from "../../graphql/mutations";
 import { mapMyJob, type JobNode, type MyJobView } from "../../adapters/job";
 export default function TechnicianDashboard() {
@@ -27,10 +27,10 @@ export default function TechnicianDashboard() {
   );
   const reportsRefetch = [{ query: MY_REPORTS_QUERY, variables: { status: "PENDING" } }];
   const [updateStatus, { loading: updating }] = useMutation(UPDATE_JOB_STATUS_MUTATION, {
-    refetchQueries: [{ query: MY_JOBS_QUERY }, ...reportsRefetch],
+    refetchQueries: [{ query: MY_JOBS_QUERY }, ...reportsRefetch, { query: MY_NOTIFICATIONS_QUERY }],
   });
   const [submitReport, { loading: submittingReport }] = useMutation(SUBMIT_REPORT_MUTATION, {
-    refetchQueries: reportsRefetch,
+    refetchQueries: [...reportsRefetch, { query: MY_NOTIFICATIONS_QUERY }],
   });
   const jobs: MyJobView[] = (data?.myJobs ?? []).map(mapMyJob);
   const activeCount = jobs.filter((j) => j.status === "PENDING" || j.status === "IN_PROGRESS").length;

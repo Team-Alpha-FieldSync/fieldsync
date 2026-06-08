@@ -5,7 +5,11 @@
   "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node src/index.js"
+    "start": "node src/index.js",
+    "clear-db": "node src/scripts/clearDatabase.js",
+    "admin": "node src/scripts/updateAdmin.js",
+    "admin:update": "node src/scripts/updateAdmin.js update",
+    "admin:create": "node src/scripts/updateAdmin.js create"
   },
   "keywords": [],
   "author": "",
@@ -20,6 +24,7 @@
     "express": "^5.2.1",
     "graphql": "^16.14.0",
     "jsonwebtoken": "^9.0.3",
-    "mongoose": "^9.6.2"
+    "mongoose": "^9.6.2",
+    "nodemailer": "^8.0.10"
   }
 }

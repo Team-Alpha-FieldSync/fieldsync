@@ -3,7 +3,8 @@ import Job from "../../models/Job.js";
 import User from '../../models/User.js'
 import Notification from '../../models/Notification.js';
 import {requireAuth, requireTechnician} from '../../guards/roles.js';
-import {ROLES, NOTIFICATION_TYPE} from '../../utils/constants.js';
+import {ROLES} from '../../utils/constants.js';
+import { notifySystemAlert } from '../../services/notificationService.js';
 
 export default {
     Query: {
@@ -41,6 +42,17 @@ export default {
             return notification;
         },
 
+        markAllNotificationsRead: async (_, __, { user }) => {
+            requireAuth(user);
+
+            await Notification.updateMany(
+                { user: user.userId, read: false },
+                { read: true },
+            );
+
+            return Notification.find({ user: user.userId }).sort({ createdAt: -1 });
+        },
+
         reportIssue: async (_, {jobId, message}, {user}) => {
             requireTechnician(user);
             const job = await Job.findById(jobId);
@@ -57,20 +69,14 @@ export default {
                 });
             }
 
-            //Notify the admin who created the job
-            return Notification.create({
-                user: job.createdBy,
-                job: jobId,
-                type: NOTIFICATION_TYPE.SYSTEM_ALERT,
-                message,
-            });
+            return notifySystemAlert(job.createdBy, jobId, message);
         },
     },
 
     //Field resolvers
     Notification: {
         user: async (parent) => User.findById(parent.user),
-        job: async (parent) => Job.findById(parent.job),
+        job: async (parent) => (parent.job ? Job.findById(parent.job) : null),
         createdAt: (parent) => parent.createdAt.toISOString() ?? null,
         deliveredAt: (parent) => (parent.deliveredAt ? parent.deliveredAt.toISOString() : null),
     },

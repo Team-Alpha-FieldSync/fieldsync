@@ -38,7 +38,7 @@ export function mapTechnician(node: TechNode): TechView {
       ? { title: node.currentJob.title, jobId: `#${node.currentJob.code}` }
       : null,
     status: node.availability,
-    statusLabel: node.availability === "AVAILABLE" ? "Available" : "Offline",
+    statusLabel: node.availability === "AVAILABLE" ? "Available" : "Busy",
     phone: node.phone ?? "—",
     isActive: node.isActive,
   };

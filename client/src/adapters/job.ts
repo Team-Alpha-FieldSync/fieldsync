@@ -25,7 +25,7 @@ export type JobView = {
   description: string;
   category: string;
   client: { name: string; phone: string; address: string };
-  assignedTech: { name: string; id: string };
+  assignedTech: { rawId: string; name: string; id: string };
   status: JobStatus;
   priority: JobPriority;
   dateCreated: string;
@@ -78,6 +78,7 @@ export function mapJob(node: JobNode): JobView {
       address: node.location,
     },
     assignedTech: {
+      rawId: node.technician?.id ?? "",
       name: node.technician?.name ?? "Unassigned",
       id: node.technician?.techCode ?? node.technician?.id ?? "—",
     },

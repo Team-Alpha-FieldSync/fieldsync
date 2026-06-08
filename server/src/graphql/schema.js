@@ -59,6 +59,7 @@ type User {
     availability: Availability
     isActive: Boolean!
     techCode: String
+    clientCode: String
     currentJob: Job
     createdBy: User
     createdAt: String!
@@ -158,6 +159,12 @@ input CreateClientInput{
     phone: String
 }
 
+input UpdateClientInput{
+    name: String
+    email: String
+    phone: String
+}
+
 input CreateJobInput{
     title: String!
     description: String!
@@ -184,6 +191,8 @@ type Mutation {
     #User management (admin only)
     createTechnician(input: CreateTechnicianInput!): User!
     createClient(input: CreateClientInput!): User!
+    updateClient(id: ID!, input: UpdateClientInput!): User!
+    deleteClient(id: ID!): User!
 
     #Job management
     createJob(input: CreateJobInput!): Job!
@@ -199,9 +208,12 @@ type Mutation {
 
     #Technician actions
     deactivateTechnician(id: ID!): User!
+    reactivateTechnician(id: ID!): User!
+    deleteTechnician(id: ID!): User!
 
     #Notification
     markNotificationRead(id: ID!): Notification!
+    markAllNotificationsRead: [Notification!]!
 
     #Reports
     submitReport(jobId: ID!, notes: String!): Report!

@@ -9,32 +9,52 @@ import {
   Trash2,
   Edit,
   ChevronLeft,
+  UserRoundCog,
 } from "lucide-react";
 import Button from "../../components/ui/Button";
 import StatusBadge from "../../components/StatusBadge";
 import { formatPriority } from "../../utils/formatters";
-import { JOBS_QUERY } from "../../graphql/queries";
+import { JOBS_QUERY, TECHNICIANS_QUERY, DASHBOARD_STATS_QUERY, MY_NOTIFICATIONS_QUERY } from "../../graphql/queries";
 import {
   VERIFY_JOB_MUTATION,
   CANCEL_JOB_MUTATION,
   DELETE_JOB_MUTATION,
   CHANGE_JOB_PRIORITY_MUTATION,
+  REASSIGN_JOB_MUTATION,
 } from "../../graphql/mutations";
 import { mapJob, type JobNode } from "../../adapters/job";
+import { mapTechnician, type TechNode } from "../../adapters/technician";
 
 export default function Jobs() {
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [reassignTechnicianId, setReassignTechnicianId] = useState("");
   const [actionError, setActionError] = useState<string | null>(null);
 
   const { data, loading, error } = useQuery<{ jobs: JobNode[] }>(JOBS_QUERY);
+  const { data: techData } = useQuery<{ technicians: TechNode[] }>(TECHNICIANS_QUERY, {
+    variables: { activeOnly: true },
+  });
+  const technicians = (techData?.technicians ?? []).map(mapTechnician);
   const jobs = (data?.jobs ?? []).map(mapJob);
   const selectedJob = jobs.find((j) => j.rawId === selectedId) ?? null;
 
-  const refetchQueries = [{ query: JOBS_QUERY }];
+  const refetchQueries = [
+    { query: JOBS_QUERY },
+    { query: TECHNICIANS_QUERY },
+    { query: DASHBOARD_STATS_QUERY },
+    { query: MY_NOTIFICATIONS_QUERY },
+  ];
   const [verifyJob, { loading: verifying }] = useMutation(VERIFY_JOB_MUTATION, { refetchQueries });
   const [cancelJob, { loading: cancelling }] = useMutation(CANCEL_JOB_MUTATION, { refetchQueries });
   const [deleteJob, { loading: deleting }] = useMutation(DELETE_JOB_MUTATION, { refetchQueries });
   const [changePriority, { loading: changingPriority }] = useMutation(CHANGE_JOB_PRIORITY_MUTATION, { refetchQueries });
+  const [reassignJob, { loading: reassigning }] = useMutation(REASSIGN_JOB_MUTATION, { refetchQueries });
+
+  const selectJob = (rawId: string | null) => {
+    setSelectedId(rawId);
+    setReassignTechnicianId("");
+    setActionError(null);
+  };
 
   const run = async (fn: () => Promise<unknown>) => {
     setActionError(null);
@@ -56,6 +76,7 @@ export default function Jobs() {
   const canChangePriority = selectedJob?.status === "PENDING" || selectedJob?.status === "IN_PROGRESS";
   const canCancel = selectedJob?.status === "PENDING" || selectedJob?.status === "IN_PROGRESS";
   const canDelete = selectedJob?.status === "CANCELLED";
+  const canReassign = selectedJob?.status === "PENDING";
 
   return (
     <div className="flex flex-col xl:flex-row gap-4 xl:gap-6 h-full p-4 xl:p-6">
@@ -80,7 +101,7 @@ export default function Jobs() {
             jobs.map((job) => (
               <div
                 key={job.rawId}
-                onClick={() => setSelectedId(job.rawId)}
+                onClick={() => selectJob(job.rawId)}
                 className={`flex flex-col xl:grid xl:grid-cols-12 gap-3 xl:gap-4 p-4 xl:px-6 xl:py-4 xl:items-center cursor-pointer transition-colors hover:bg-bg-light ${
                   selectedId === job.rawId ? "bg-primary/5 border-l-4 border-l-primary" : "border-l-4 border-l-transparent"
                 }`}
@@ -150,7 +171,7 @@ export default function Jobs() {
             <div className="p-4 xl:p-6 border-b border-border-muted flex justify-between items-center bg-bg-light/50">
               <div className="flex items-center gap-2 xl:gap-3">
                 <button
-                  onClick={() => setSelectedId(null)}
+                  onClick={() => selectJob(null)}
                   className="xl:hidden p-1.5 -ml-2 rounded-lg text-fg-muted hover:bg-border-muted transition-colors"
                 >
                   <ChevronLeft size={24} />
@@ -207,6 +228,65 @@ export default function Jobs() {
                   {selectedJob.description}
                 </div>
               </div>
+
+              {canReassign && (
+                <div className="bg-primary/5 border border-primary/20 rounded-lg p-4 xl:p-5">
+                  <div className="flex items-center gap-2 mb-4">
+                    <UserRoundCog size={18} className="text-primary shrink-0" />
+                    <h4 className="font-bold text-fg">Reassign Technician</h4>
+                  </div>
+                  <p className="text-sm text-fg-muted mb-4">
+                    Currently assigned to <span className="font-medium text-fg">{selectedJob.assignedTech.name}</span>.
+                    Only pending jobs can be reassigned.
+                  </p>
+                  <div className="space-y-3">
+                    <div>
+                      <label className="block text-xs font-medium text-fg mb-1">New technician</label>
+                      <select
+                        value={reassignTechnicianId}
+                        onChange={(e) => setReassignTechnicianId(e.target.value)}
+                        className="w-full border border-border rounded-md p-2 text-sm bg-bg-base focus:outline-none focus:border-primary"
+                      >
+                        <option value="">Select a technician…</option>
+                        {technicians.map((tech) => (
+                          <option
+                            key={tech.rawId}
+                            value={tech.rawId}
+                            disabled={tech.rawId === selectedJob.assignedTech.rawId}
+                          >
+                            {tech.name} ({tech.id}) — {tech.statusLabel}
+                          </option>
+                        ))}
+                      </select>
+                      {technicians.length === 0 && (
+                        <p className="text-xs text-fg-muted mt-1">No active technicians available.</p>
+                      )}
+                    </div>
+                    <Button
+                      variant="primary"
+                      className="w-full justify-center"
+                      disabled={
+                        !reassignTechnicianId ||
+                        reassigning ||
+                        reassignTechnicianId === selectedJob.assignedTech.rawId
+                      }
+                      onClick={() =>
+                        run(async () => {
+                          await reassignJob({
+                            variables: {
+                              id: selectedJob.rawId,
+                              technicianId: reassignTechnicianId,
+                            },
+                          });
+                          setReassignTechnicianId("");
+                        })
+                      }
+                    >
+                      {reassigning ? "Reassigning…" : "Reassign Job"}
+                    </Button>
+                  </div>
+                </div>
+              )}
 
               {/* Action Buttons */}
               <div className="pt-4 border-t border-border-muted space-y-3 pb-8 xl:pb-0">

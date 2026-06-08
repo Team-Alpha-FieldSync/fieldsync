@@ -1,24 +1,31 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useMutation } from "@apollo/client/react";
 import Modal from "./ui/Modal";
 import Button from "./ui/Button";
-import { CREATE_CLIENT_MUTATION } from "../graphql/mutations";
+import { UPDATE_CLIENT_MUTATION } from "../graphql/mutations";
 import { CLIENTS_QUERY, MY_NOTIFICATIONS_QUERY } from "../graphql/queries";
+import type { ClientView } from "../adapters/client";
 
-interface AddClientModalProps {
+interface EditClientModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onCreated?: (client: { id: string; name: string }) => void;
+  client: ClientView | null;
 }
 
-const INITIAL_FORM = { name: "", email: "", phone: "" };
+export default function EditClientModal({ isOpen, onClose, client }: EditClientModalProps) {
+  const [form, setForm] = useState({ name: "", email: "", phone: "" });
 
-export default function AddClientModal({ isOpen, onClose, onCreated }: AddClientModalProps) {
-  const [form, setForm] = useState(INITIAL_FORM);
+  useEffect(() => {
+    if (client) {
+      setForm({
+        name: client.name,
+        email: client.email,
+        phone: client.phone === "�" ? "" : client.phone,
+      });
+    }
+  }, [client]);
 
-  const [createClient, { loading, error }] = useMutation<{
-    createClient: { id: string; name: string };
-  }>(CREATE_CLIENT_MUTATION, {
+  const [updateClient, { loading, error }] = useMutation(UPDATE_CLIENT_MUTATION, {
     refetchQueries: [{ query: CLIENTS_QUERY }, { query: MY_NOTIFICATIONS_QUERY }],
   });
 
@@ -29,9 +36,11 @@ export default function AddClientModal({ isOpen, onClose, onCreated }: AddClient
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!client) return;
     try {
-      const { data } = await createClient({
+      await updateClient({
         variables: {
+          id: client.rawId,
           input: {
             name: form.name,
             email: form.email,
@@ -39,8 +48,6 @@ export default function AddClientModal({ isOpen, onClose, onCreated }: AddClient
           },
         },
       });
-      if (data?.createClient) onCreated?.(data.createClient);
-      setForm(INITIAL_FORM);
       onClose();
     } catch {
       // surfaced via `error`
@@ -48,13 +55,16 @@ export default function AddClientModal({ isOpen, onClose, onCreated }: AddClient
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Add Client">
+    <Modal isOpen={isOpen} onClose={onClose} title="Edit Client">
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
           <label className="block text-sm font-medium text-fg mb-1">Client / Company Name</label>
           <input
-            type="text" name="name" value={form.name} onChange={handleChange}
-            placeholder="e.g. Acme Corp" required
+            type="text"
+            name="name"
+            value={form.name}
+            onChange={handleChange}
+            required
             className="w-full bg-bg-light border border-border-muted text-sm text-fg rounded-md py-2 px-3 focus:outline-none focus:border-primary"
           />
         </div>
@@ -62,16 +72,21 @@ export default function AddClientModal({ isOpen, onClose, onCreated }: AddClient
           <div>
             <label className="block text-sm font-medium text-fg mb-1">Email</label>
             <input
-              type="email" name="email" value={form.email} onChange={handleChange}
-              placeholder="contact@acme.com" required
+              type="email"
+              name="email"
+              value={form.email}
+              onChange={handleChange}
+              required
               className="w-full bg-bg-light border border-border-muted text-sm text-fg rounded-md py-2 px-3 focus:outline-none focus:border-primary"
             />
           </div>
           <div>
             <label className="block text-sm font-medium text-fg mb-1">Phone</label>
             <input
-              type="tel" name="phone" value={form.phone} onChange={handleChange}
-              placeholder="+1 555 000 0000"
+              type="tel"
+              name="phone"
+              value={form.phone}
+              onChange={handleChange}
               className="w-full bg-bg-light border border-border-muted text-sm text-fg rounded-md py-2 px-3 focus:outline-none focus:border-primary"
             />
           </div>
@@ -80,9 +95,11 @@ export default function AddClientModal({ isOpen, onClose, onCreated }: AddClient
         {error && <p className="text-sm text-danger">{error.message}</p>}
 
         <div className="flex justify-end gap-3 pt-4 border-t border-border-muted mt-6">
-          <Button type="button" variant="secondary" onClick={onClose}>Cancel</Button>
+          <Button type="button" variant="secondary" onClick={onClose}>
+            Cancel
+          </Button>
           <Button type="submit" variant="primary" disabled={loading}>
-            {loading ? "Creating..." : "Create Client"}
+            {loading ? "Saving�" : "Save Changes"}
           </Button>
         </div>
       </form>

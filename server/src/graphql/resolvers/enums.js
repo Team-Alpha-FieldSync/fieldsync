@@ -1,4 +1,4 @@
-import { ROLES, JOB_STATUS, NOTIFICATION_TYPE } from '../../utils/constants.js';
+import { ROLES, JOB_STATUS, NOTIFICATION_TYPE, JOB_PRIORITY, JOB_CATEGORY, AVAILABILITY, REPORT_STATUS } from '../../utils/constants.js';
 
 // Map between GraphQL enum names (UPPERCASE) and database string values (lowercase).
 // This runs automatically whenever Apollo serializes or parses these enums.
@@ -24,5 +24,29 @@ export default {
     JOB_COMPLETED: NOTIFICATION_TYPE.JOB_COMPLETED,
     JOB_VERIFIED: NOTIFICATION_TYPE.JOB_VERIFIED,
     SYSTEM_ALERT: NOTIFICATION_TYPE.SYSTEM_ALERT,
+  },
+
+  Priority: {
+    HIGH: JOB_PRIORITY.HIGH,
+    MEDIUM: JOB_PRIORITY.MEDIUM,
+    LOW: JOB_PRIORITY.LOW,
+  },
+
+  Category: {
+    NETWORKING: JOB_CATEGORY.NETWORKING,
+    ELECTRICAL: JOB_CATEGORY.ELECTRICAL,
+    HVAC: JOB_CATEGORY.HVAC,
+    PLUMBING: JOB_CATEGORY.PLUMBING,
+    OTHER: JOB_CATEGORY.OTHER,
+  },
+
+  Availability: {
+    AVAILABLE: AVAILABILITY.AVAILABLE,
+    UNAVAILABLE: AVAILABILITY.UNAVAILABLE,
+  },
+
+  ReportStatus: {
+    PENDING: REPORT_STATUS.PENDING,
+    SUBMITTED: REPORT_STATUS.SUBMITTED,
   },
 };
